@@ -1,0 +1,562 @@
+<?php
+
+namespace App\Http\Controllers\MiseEnStage;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use Illuminate\Support\Facades\DB;
+use App\Models\AgentFormation;
+use App\Models\{Country,State,City};
+
+use App\Models\MiseEnStage;
+use App\Models\RetourDeStage;
+
+class MiseEnStageController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+
+    public function index()
+    {
+        $m_stages = MiseEnStage::all();
+        foreach ($m_stages as $mise) {
+            $c = Country::where('id',$mise->pays_stage_id)->first();
+            $r = State::where('id',$mise->region_stage_id)->first();
+            $v = City::where('id',$mise->ville_stage_id)->first();
+            $mise->pays_stage = ( $c != null) ? $c->name : "Not specified" ;
+            $mise->region_stage = ( $r != null) ? $r->name : "Not specified" ;
+            $mise->ville_stage = ( $v != null) ? $v->name : "Not specified" ;
+        }
+        return view('admin.mise_stage.data',compact('m_stages'));
+    }
+
+    public function form_insert()
+    {
+        $agents = AgentFormation::all();
+        $countries =  Country::all();
+        return view('admin.mise_stage.form_insert',compact('agents','countries'));
+    }
+
+    public function insert(Request $request)
+    {
+        $rules = [
+            'id_agent' =>'required'
+        ];
+        $valid = MiseEnStage::where('id_agent',$request->id_agent)->first();
+        $validator = Validator::make($request->all(), $rules);
+        if($validator->fails() || $valid != null)
+        {
+            return redirect()->back()->with('validation','error');
+        }
+        else
+        {   
+            $isagent = AgentFormation::where('id',$request->id_agent)->first();
+            if($isagent == null)
+            {
+                return redirect()->back()->with('agents_not_exist','error');
+            }
+            $mise_s = new MiseEnStage;
+            $mise_s->id_agent = $request->id_agent;
+            $mise_s->numero_decision_ms = $request->numero_decision_ms;
+            $mise_s->date_signature = $request->date_signature;
+            $mise_s->nature_bourse = $request->nature_bourse;
+            $mise_s->date_demarrage_stage = $request->date_demarrage_stage;
+            $mise_s->niveau = $request->niveau;
+            $mise_s->annee_stage = $request->annee_stage;
+            $mise_s->filiere = $request->filiere;
+            $mise_s->spec_option = $request->spec_option;
+            $mise_s->ecole_stage = $request->ecole_stage;
+            $mise_s->duree = $request->duree;
+            $mise_s->pays_stage_id = $request->pays_stage;
+            $mise_s->region_stage_id = $request->region_stage;
+            $mise_s->ville_stage_id = $request->ville_stage;
+
+            if($mise_s->save())
+            {
+                return redirect()->back()->with('success','success');
+            }
+            else
+            {
+                return redirect()->back()->with('error','error');
+            }
+            
+        }
+        
+        
+        
+    }
+ 
+    public function delete($id)
+    {
+        $m_s = MiseEnStage::where('id',$id)->get();
+        if(!$m_s->isEmpty())
+        {
+            $m_sIsDeleted = MiseEnStage::find($id)->delete();
+            if($m_sIsDeleted)
+            {
+                return redirect()->back()->with('success','success');
+            }
+            else
+            {
+                return redirect()->back()->with('emerror','error');
+            }
+        }
+        else
+        {
+            return redirect()->back()->with('error','error');
+        }
+    }
+
+    public function prepareUpdate(Request $request)
+    {
+        $mise_stage = MiseEnStage::where('id',$request->id)->first();
+        $agents = AgentFormation::all();
+        $countries =  Country::all();
+        return view('admin.mise_stage.form_update',compact('agents','mise_stage','countries'));
+    }
+
+    public function update(Request $request)
+    {
+        $rules = [
+            'id_agent' =>'required'
+        ];
+ 
+        $valid = MiseEnStage::where('id',$request->id)->first();
+        $validator = Validator::make($request->all(), $rules);
+        if($validator->fails() || $valid == null)
+        {
+            return redirect()->back()->with('validation','error');
+        }
+        else
+        {
+            $mise_s =  MiseEnStage::where('id',$request->id)->first();
+            $mise_s->id_agent = $request->id_agent;
+            $mise_s->numero_decision_ms = $request->numero_decision_ms;
+            $mise_s->date_signature = $request->date_signature;
+            $mise_s->nature_bourse = $request->nature_bourse;
+            $mise_s->date_demarrage_stage = $request->date_demarrage_stage;
+            $mise_s->niveau = $request->niveau;
+            $mise_s->annee_stage = $request->annee_stage;
+            $mise_s->filiere = $request->filiere;
+            $mise_s->spec_option = $request->spec_option;
+            $mise_s->ecole_stage = $request->ecole_stage;
+            $mise_s->duree = $request->duree;
+            $mise_s->pays_stage_id = $request->pays_stage;
+            $mise_s->region_stage_id = $request->region_stage;
+            $mise_s->ville_stage_id = $request->ville_stage;
+            if($mise_s->save())
+            {
+                return redirect()->back()->with('success','success');
+            }
+            else
+            {
+                return redirect()->back()->with('error','error');
+            }
+        }
+
+    } 
+
+    public function form_import()
+    {
+        return view('admin.mise_stage.form_import');
+    }
+
+
+    public function import(Request $request)
+    {
+        $rules = array('importfile' => 'mimes:xlsx,xls');
+ 
+        $file = $request->file('importfile');//->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
+        $allowed = ['xlsx','xls'];
+        //dd($file->getClientOriginalExtension());
+        $validator = Validator::make($request->all(), $rules);
+        $linesWithError = [];
+        if(!in_array($extension,$allowed))
+        {
+            return redirect()->back()->with('validation','error');
+        }
+        else
+        {
+            $spreadsheet = IOFactory::load($file);
+
+            $mise_stage = $spreadsheet->getSheet(0);
+
+            $numberOfRow = $mise_stage->getHighestRow();
+  
+            // $highestColumn = $domainsheet->getHighestColumn(); // e.g 'F'
+            // $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // e.g. 5
+
+            for($i = 2; $i <= $numberOfRow; $i++)
+            {
+                $currentMatricule = $mise_stage->getCellByColumnAndRow(1,$i)->getValue();
+                $date_signature = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
+                $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(5,$i)->getValue();
+                $numero_decision_ms = $mise_stage->getCellByColumnAndRow(6,$i)->getValue();
+                $nature_bourse = $mise_stage->getCellByColumnAndRow(7,$i)->getValue();
+                $duree = $mise_stage->getCellByColumnAndRow(8,$i)->getValue();
+                $annee = $mise_stage->getCellByColumnAndRow(9,$i)->getValue();
+                $niveau = $mise_stage->getCellByColumnAndRow(10,$i)->getValue();
+                $filiere = $mise_stage->getCellByColumnAndRow(11,$i)->getValue();
+                $spec_option = $mise_stage->getCellByColumnAndRow(12,$i)->getValue();
+                $country = $mise_stage->getCellByColumnAndRow(13,$i)->getValue();
+                $state = $mise_stage->getCellByColumnAndRow(14,$i)->getValue();
+                $city = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
+                $ecole_stage = $mise_stage->getCellByColumnAndRow(16,$i)->getValue();
+
+                //dd($country,$state,$city);
+
+                if($spec_option instanceof RichText)
+                {
+                    $spec_option = $spec_option->getPlainText();
+                }
+                else
+                {
+                    $spec_option = (string)$spec_option;
+                }
+
+
+                if($city instanceof RichText)
+                {
+                    $city = $city->getPlainText();
+                }
+                else
+                {
+                    $city = (string)$city;
+                }
+
+                // appel a model 
+                $city_id = City::where('name',$city)->first();
+                //dd($city_id->id);
+
+                if($state instanceof RichText)
+                {
+                    $state = $state->getPlainText();
+                }
+                else
+                {
+                    $state = (string)$state;
+                }
+
+                //Appel a state
+                $state_id = State::where('name',$state)->first();
+
+                if($country instanceof RichText)
+                {
+                    $country = $country->getPlainText();
+                }
+                else
+                {
+                    $country = (string)$country;
+                }
+
+                //Appel a country
+                $country_id = Country::where('name',$country)->first();
+
+                if($filiere instanceof RichText)
+                {
+                    $filiere = $filiere->getPlainText();
+                }
+                else
+                {
+                    $filiere = (string)$filiere;
+                }
+
+                if($niveau instanceof RichText)
+                {
+                    $niveau = $niveau->getPlainText();
+                }
+                else
+                {
+                    $niveau = (string)$niveau;
+                }
+
+
+
+                if($annee instanceof RichText)
+                {
+                    $annee = $annee->getPlainText();
+                }
+                else
+                {
+                    $annee = (string)$annee;
+                }
+
+
+                if($duree instanceof RichText)
+                {
+                    $duree = $duree->getPlainText();
+                }
+                else
+                {
+                    $duree = (string)$duree;
+                }
+
+                if($nature_bourse instanceof RichText)
+                {
+                    $nature_bourse = $nature_bourse->getPlainText();
+                }
+                else
+                {
+                    $nature_bourse = (string)$nature_bourse;
+                }
+
+                if($numero_decision_ms instanceof RichText)
+                {
+                    $numero_decision_ms = $numero_decision_ms->getPlainText();
+                }
+                else
+                {
+                    $numero_decision_ms = (string)$numero_decision_ms;
+                }
+
+             
+
+                if($date_demarrage_stage instanceof RichText)
+                {
+                    $date_demarrage_stage = $date_demarrage_stage->getPlainText();
+                }
+                else
+                {
+                    $date_demarrage_stage = (string)$date_demarrage_stage;
+                }
+
+                if($date_signature instanceof RichText)
+                {
+                    $date_signature = $date_signature->getPlainText();
+                }
+                else
+                {
+                    $date_signature = (string)$date_signature;
+                }
+
+
+                if($currentMatricule instanceof RichText)
+                {
+                    $currentMatricule = $currentMatricule->getPlainText();
+                }
+                else
+                {
+                    $currentMatricule = (string)$currentMatricule;
+                }
+                if(!$this->agentExist($currentMatricule))
+                {
+                    $linesWithError[] = $i;
+                }
+                else
+                {
+                    $id_agent = AgentFormation::where('matricule',$currentMatricule)->first();
+                    $mise_s = new MiseEnStage;
+                    $mise_s->id_agent = $id_agent->id;
+                    $mise_s->numero_decision_ms = $numero_decision_ms;
+                    $mise_s->date_signature = $date_signature;
+                    $mise_s->nature_bourse = $nature_bourse;
+                    $mise_s->date_demarrage_stage = $date_demarrage_stage;
+                    $mise_s->niveau = $niveau;
+                    $mise_s->filiere = $filiere;
+                    $mise_s->spec_option = $spec_option;
+                    $mise_s->ecole_stage = $ecole_stage;
+                    $mise_s->duree = $duree;
+                    $mise_s->duree = $annee;
+                    $mise_s->pays_stage_id = $country_id->id;
+                    $mise_s->region_stage_id = $state_id->id;
+                    $mise_s->ville_stage_id = $city_id->id;
+
+                    if($mise_s->save())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        $linesWithError[] = $i;
+                    }
+                }
+            }
+
+            if($linesWithError == null || (count($linesWithError)==0))
+            {
+                return redirect()->back()->with('success','success');
+            }
+            else
+            {
+                $errorSpreadSheet = $this->copyRowsFromArray($linesWithError, $spreadsheet);
+
+                $writer = new Xlsx($errorSpreadSheet);
+                $path = public_path();
+                $path = $path."/template/unsaved.xlsx";
+                $writer->save($path);
+
+                return redirect()->back()->with("path","template/unsaved.xlsx") 
+                                        ->with('warning','warning');
+            }
+
+        }
+
+    }
+
+    public function agentExist($mat)
+    {
+        
+        $matricule = trim(strtolower($mat));
+        $agent = AgentFormation::where('matricule',$matricule)->first();
+        if($agent == null)
+        {
+            return false;
+        }
+        $mised = MiseEnStage::where('id_agent',$agent->id)->count();
+        if($mised != 0)
+        {
+            $retoured = RetourDeStage::where('id_agent',$agent->id)->count();
+            if($retoured == 0) {
+                return false;
+            }
+
+            if ($mised - $retoured == 1)  {
+                return false;
+            }
+
+            return true;
+
+        }
+       
+        return true;
+    }
+
+    public function copyRowsFromArray($rows, Spreadsheet $oldSpreadSheet)
+    {
+        $spreadsheet = new Spreadsheet();
+        $numberOfSheet = $oldSpreadSheet->getSheetCount();
+        $errorSheet = $spreadsheet->getActiveSheet();
+        
+        $oldDataSheet = $oldSpreadSheet->getSheet(($numberOfSheet-1));
+        $highestColumn = $oldDataSheet->getHighestDataColumn(); // e.g 'F'
+        $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // e.g. 5
+
+        $numberOfRows = count($rows);
+        $i = 0;
+        for($row = 1; $row <= $numberOfRows; $row++)
+        {
+            for($j = 1; $j <= $highestColumnIndex; $j++)
+            {
+                $oldCellValue = $oldDataSheet->getCellByColumnAndRow($j,$rows[$i])->getValue();
+
+                if($oldCellValue instanceof  RichText)
+                {
+                    $oldCellValue = $oldCellValue->getPlainText();
+                }
+                if(!is_string($oldCellValue) && $oldCellValue != null)
+                {
+                     $oldCellValue = (int)$oldCellValue;
+                     if($oldCellValue == 0)
+                     {
+                        $oldCellValue = "";
+                     }
+                }
+                $errorSheet->getCellByColumnAndRow($j,$row)->setValue($oldCellValue);
+            }
+            $i++;
+        }
+        
+        return $spreadsheet;
+    }
+
+    public function export()
+    {
+        $spreadsheet = new Spreadsheet();
+        $mise_stage = $spreadsheet->getActiveSheet();
+        $mise_m = MiseEnStage::all();
+        $datasetname = "mise_en_stage";
+        $mise_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
+        $mise_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
+        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Structure");
+        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de signature de mise en stage");
+        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Date de démarrage du stage");
+        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(7,1)->setValue("Nature de la bourse");
+        $mise_stage->getCellByColumnAndRow(8,1)->setValue("Durée du stage");
+        $mise_stage->getCellByColumnAndRow(9,1)->setValue("Année du stage");
+        $mise_stage->getCellByColumnAndRow(10,1)->setValue("Niveau");
+        $mise_stage->getCellByColumnAndRow(11,1)->setValue("Filière");
+        $mise_stage->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
+        $mise_stage->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Region du stage");
+        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ville du stage");
+        $mise_stage->getCellByColumnAndRow(16,1)->setValue("Ecole du stage");
+
+        $i = 2;
+        foreach($mise_m as $mise)
+        {
+            $mise_stage->getCellByColumnAndRow(1,$i)->setValue($mise->agent->matricule);
+            $mise_stage->getCellByColumnAndRow(2,$i)->setValue($mise->agent->nom_prenoms);
+            $mise_stage->getCellByColumnAndRow(3,$i)->setValue($mise->agent->structure);
+            $mise_stage->getCellByColumnAndRow(4,$i)->setValue($mise->date_signature);
+            $mise_stage->getCellByColumnAndRow(5,$i)->setValue($mise->date_demarrage_stage);
+            $mise_stage->getCellByColumnAndRow(6,$i)->setValue($mise->numero_decision_ms);
+            $mise_stage->getCellByColumnAndRow(7,$i)->setValue($mise->nature_bourse);
+            $mise_stage->getCellByColumnAndRow(8,$i)->setValue($mise->duree);
+            $mise_stage->getCellByColumnAndRow(9,$i)->setValue($mise->annee);
+            $mise_stage->getCellByColumnAndRow(10,$i)->setValue($mise->niveau);
+            $mise_stage->getCellByColumnAndRow(11,$i)->setValue($mise->filiere);
+            $mise_stage->getCellByColumnAndRow(11,$i)->setValue($mise->spec_option);
+            $mise_stage->getCellByColumnAndRow(12,$i)->setValue($mise->country->name);
+            $mise_stage->getCellByColumnAndRow(13,$i)->setValue($mise->state->name);
+            $mise_stage->getCellByColumnAndRow(14,$i)->setValue($mise->city->name);
+            $mise_stage->getCellByColumnAndRow(15,$i)->setValue($mise->ecole_stage);
+            $i++;
+        }
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        $writer = new Xlsx($spreadsheet);
+        $path = public_path();
+        $path = $path."/template/$datasetname.xlsx";
+        $writer->save($path);
+
+        return redirect()->back()->with("path","template/$datasetname.xlsx");
+    }
+
+    public function genererExp()
+    {
+        $spreadsheet = new Spreadsheet();
+        $mise_stage = $spreadsheet->getActiveSheet();
+        $datasetname = "mise_en_stage";
+        $mise_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
+        $mise_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
+        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Structure");
+        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de signature de mise en stage");
+        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Date de démarrage du stage");
+        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(7,1)->setValue("Nature de la bourse");
+        $mise_stage->getCellByColumnAndRow(8,1)->setValue("Durée du stage");
+        $mise_stage->getCellByColumnAndRow(9,1)->setValue("Année du stage");
+        $mise_stage->getCellByColumnAndRow(10,1)->setValue("Niveau");
+        $mise_stage->getCellByColumnAndRow(11,1)->setValue("Filière");
+        $mise_stage->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
+        $mise_stage->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Region du stage");
+        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ville du stage");
+        $mise_stage->getCellByColumnAndRow(16,1)->setValue("Ecole du stage");
+
+       
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        $writer = new Xlsx($spreadsheet);
+        $path = public_path();
+        $path = $path."/template/$datasetname.xlsx";
+        $writer->save($path);
+
+        return redirect()->back()->with("examplaire","template/$datasetname.xlsx");
+    }
+
+}
