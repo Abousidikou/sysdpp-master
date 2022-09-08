@@ -164,7 +164,10 @@ class AggregatController extends Controller
                                 foreach ($annee as $ann) {
                                         $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue(0);
                                 }
+                                $lHIndex = 1;
+                                $lVIndex +=1;
                                 continue;
+
                             }
 
                             //$agg = $aggregat[0];
