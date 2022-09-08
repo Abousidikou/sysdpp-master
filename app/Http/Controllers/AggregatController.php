@@ -39,8 +39,17 @@ class AggregatController extends Controller
         $id_sexe =  DB::table('type')->select('id')->where('wording','Sexe')->first();
         $sexes = Level::where('id_type',$id_sexe->id)->get();
         $indics  =  Indicators::whereIn('id', [225,226,251,252])->get();
+
+        $ann = collect();
         $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
-        return view('admin.aggregat.index',compact('aggV','sexes','statuts','categories','corps','structures','indics'));
+        $aggA = DB::table('retour_de_stages')->select('annee_rs')->distinct('annee_rs')->get();  
+        foreach ($aggV as $val) {
+            $ann[] = $val->annee_stage;
+        }   
+        foreach ($aggA as $val) {
+            $ann[] = $val->annee_rs;
+        } 
+        return view('admin.aggregat.index',compact('ann','sexes','statuts','categories','corps','structures','indics'));
         
     }
 

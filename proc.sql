@@ -211,7 +211,57 @@ BEGIN
 End$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS `CONTROLLER`;
+
+DELIMITER $$
+CREATE  PROCEDURE `CONTROLLER`()
+    NO SQL
+BEGIN
+    DECLARE c_indic VARCHAR(255) DEFAULT "";
+    DECLARE c_annee VARCHAR(255) DEFAULT "";
+    DECLARE length INT DEFAULT 0;
+    DECLARE counter INT DEFAULT 0;
+
+    SELECT COUNT(*) FROM aggregat_inputs INTO length;
+    SET counter=0;
+    WHILE counter<length DO
+    	SELECT indic, annee INTO c_indic, c_annee FROM aggregat_inputs LIMIT counter,1;
+        IF ( c_indic = 225) THEN 
+            CALL  AVECBOURSE(c_indic,c_annee);
+        ELSEIF ( c_indic = 226 ) THEN
+            CALL  MISEENSTAGE(c_indic,c_annee);
+        ELSEIF ( c_indic = 251 ) THEN
+            CALL  SANSBOURSE(c_indic,c_annee);
+        ELSEIF ( c_indic = 226 ) THEN
+            CALL  RETOURDESTAGE(c_indic,c_annee);
+        ELSE           
+            CALL  ALLDONE();
+        END IF;
+        SET counter = counter + 1;
+    END WHILE;
+End$$
+DELIMITER ;
+
 
 DROP TRIGGER IF EXISTS `CALLFILL`;
 CREATE TRIGGER `CALLFILL` AFTER INSERT ON `aggregat_start`
  FOR EACH ROW CALL CONTROLLER();
+
+
+
+
+ 
+
+UPDATE `indicators` SET `wording` = 'Effectifs des agents civils de l’Etat ayant bénéficié de décision de mise en stage' WHERE `indicators`.`id` = 226;
+
+INSERT INTO `indicators` (`id`, `wording`, `id_subdomain`, `created_at`, `updated_at`) VALUES (NULL, "Effectifs des agents civils de l’Etat n'ayant pas bénéficié de bourses", '31', NULL, NULL);
+INSERT INTO `indicators` (`id`, `wording`, `id_subdomain`, `created_at`, `updated_at`) VALUES (NULL, "Effectifs des agents civils de l’Etat ayant bénéficié de décision de retour de stage", '31', NULL, NULL);
+INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '85', NULL, NULL);
+INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '87', NULL, NULL);
+INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '125', NULL, NULL);
+INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '122', NULL, NULL);
+INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '124', NULL, NULL);
+
+
+
+

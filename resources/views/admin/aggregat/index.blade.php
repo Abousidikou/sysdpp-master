@@ -114,8 +114,8 @@
                                 <div class="col-md-3">
                                     <label class="form-label"><small> Année du stage</small> </label><br>
                                     <select name="annee[]" class="form-control show-tick" data-live-search="true" id="annee_stage" required>
-                                        @foreach ($aggV as $agg)
-                                        <option value="{{ $agg->annee_stage }}" style="background:#919c9e; color: #fff;" >{{ $agg->annee_stage }}</option>
+                                        @foreach ($ann as $an)
+                                        <option value="{{ $an }}" style="background:#919c9e; color: #fff;" >{{ $an }}</option>
                                         @endforeach
                                     </select>
                                     <label class="form-label"></label>
