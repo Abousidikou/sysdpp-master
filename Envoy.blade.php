@@ -38,7 +38,7 @@
     @if($remote)
         git remote update;
     @endif
-    git archive sidik | tar -x -C {{ $release }};
+    git archive main | tar -x -C {{ $release }};
     echo  "Release {{ $release }} created";
 @endtask
 
@@ -46,6 +46,9 @@
     mkdir -p {{ $shared }}/vendor;
     ln -s -f {{ $shared }}/vendor {{ $release }}/vendor;
     cd {{ $release }};
+composer config --no-plugins allow-plugins.symfony/thanks true;
+composer clearcache;
+   composer install;
     composer update --no-dev --no-progress ;{{-- --ignore-platform-reqs --}}
 @endtask
 
@@ -75,7 +78,8 @@
 
 @task('createMigration')
     cd {{ $release }};
-    php artisan migrate --path=database/migrations/formation --force;
+    php artisan migrate --path=database/migrations/deployv1 --force;
+    php artisan migrate --path=database/migrations/aggregat --force;
 @endtask
 
 @task('generateKey')
@@ -90,3 +94,4 @@
     chmod -R 777 {{ $release }}/storage/
     echo "Link {{ $currentRelease }} --> {{ $release }} created";
 @endtask
+
