@@ -17,6 +17,7 @@
     composer
     links
     generateKey
+    pclear
     currentRelease
 @endmacro
 
@@ -95,3 +96,10 @@ composer clearcache;
     echo "Link {{ $currentRelease }} --> {{ $release }} created";
 @endtask
 
+@task('pclear')
+    cd {{ $release }};
+    php artisan cache:clear;
+    php artisan view:clear;
+    php artisan config:clear;
+    php artisan route:clear;
+@endtask

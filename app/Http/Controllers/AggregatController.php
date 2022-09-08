@@ -49,7 +49,6 @@ class AggregatController extends Controller
         foreach ($aggA as $val) {
             $ann[] = $val->annee_rs;
         } 
-        dd($ann);
         return view('admin.aggregat.index',compact('ann','sexes','statuts','categories','corps','structures','indics'));
         
     }
