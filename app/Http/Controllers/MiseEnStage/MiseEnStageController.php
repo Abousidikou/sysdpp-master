@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgentFormation;
+use App\Models\Level;
 use App\Models\{Country,State,City};
 
 use App\Models\MiseEnStage;
@@ -168,7 +169,10 @@ class MiseEnStageController extends Controller
 
     public function form_import()
     {
-        return view('admin.mise_stage.form_import');
+        $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+        $structures = Level::where('id_type',$id_structure->id)->get();
+        $countries =  Country::all();
+        return view('admin.mise_stage.form_import',compact('structures','countries'));
     }
 
 
@@ -209,10 +213,8 @@ class MiseEnStageController extends Controller
                 $niveau = $mise_stage->getCellByColumnAndRow(10,$i)->getValue();
                 $filiere = $mise_stage->getCellByColumnAndRow(11,$i)->getValue();
                 $spec_option = $mise_stage->getCellByColumnAndRow(12,$i)->getValue();
-                $country = $mise_stage->getCellByColumnAndRow(13,$i)->getValue();
-                $state = $mise_stage->getCellByColumnAndRow(14,$i)->getValue();
-                $city = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
-                $ecole_stage = $mise_stage->getCellByColumnAndRow(16,$i)->getValue();
+                $city = $mise_stage->getCellByColumnAndRow(14,$i)->getValue();
+                $ecole_stage = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
 
                 //dd($country,$state,$city);
 
@@ -236,32 +238,14 @@ class MiseEnStageController extends Controller
                 }
 
                 // appel a model 
-                $city_id = City::where('name',$city)->first();
-                //dd($city_id->id);
-
-                if($state instanceof RichText)
-                {
-                    $state = $state->getPlainText();
+                $city = City::where('name',$city)->first();
+                if ($city == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
-                else
-                {
-                    $state = (string)$state;
-                }
-
                 //Appel a state
-                $state_id = State::where('name',$state)->first();
-
-                if($country instanceof RichText)
-                {
-                    $country = $country->getPlainText();
-                }
-                else
-                {
-                    $country = (string)$country;
-                }
-
+                $state = State::where('id',$city->state_id)->first();
                 //Appel a country
-                $country_id = Country::where('name',$country)->first();
+                $country = Country::where('id',$state->country_id)->first();
 
                 if($filiere instanceof RichText)
                 {
@@ -368,9 +352,9 @@ class MiseEnStageController extends Controller
                     $mise_s->ecole_stage = $ecole_stage;
                     $mise_s->duree = $duree;
                     $mise_s->duree = $annee;
-                    $mise_s->pays_stage_id = $country_id->id;
-                    $mise_s->region_stage_id = $state_id->id;
-                    $mise_s->ville_stage_id = $city_id->id;
+                    $mise_s->pays_stage_id = $country->id;
+                    $mise_s->region_stage_id = $state->id;
+                    $mise_s->ville_stage_id = $city->id;
 
                     if($mise_s->save())
                     {
@@ -489,9 +473,8 @@ class MiseEnStageController extends Controller
         $mise_stage->getCellByColumnAndRow(11,1)->setValue("Filière");
         $mise_stage->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
         $mise_stage->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
-        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Region du stage");
-        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ville du stage");
-        $mise_stage->getCellByColumnAndRow(16,1)->setValue("Ecole du stage");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Ville du stage");
+        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ecole du stage");
 
         $i = 2;
         foreach($mise_m as $mise)
@@ -507,9 +490,8 @@ class MiseEnStageController extends Controller
             $mise_stage->getCellByColumnAndRow(9,$i)->setValue($mise->annee);
             $mise_stage->getCellByColumnAndRow(10,$i)->setValue($mise->niveau);
             $mise_stage->getCellByColumnAndRow(11,$i)->setValue($mise->filiere);
-            $mise_stage->getCellByColumnAndRow(11,$i)->setValue($mise->spec_option);
-            $mise_stage->getCellByColumnAndRow(12,$i)->setValue($mise->country->name);
-            $mise_stage->getCellByColumnAndRow(13,$i)->setValue($mise->state->name);
+            $mise_stage->getCellByColumnAndRow(12,$i)->setValue($mise->spec_option);
+            $mise_stage->getCellByColumnAndRow(13,$i)->setValue($mise->country->name);
             $mise_stage->getCellByColumnAndRow(14,$i)->setValue($mise->city->name);
             $mise_stage->getCellByColumnAndRow(15,$i)->setValue($mise->ecole_stage);
             $i++;
@@ -543,9 +525,8 @@ class MiseEnStageController extends Controller
         $mise_stage->getCellByColumnAndRow(11,1)->setValue("Filière");
         $mise_stage->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
         $mise_stage->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
-        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Region du stage");
-        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ville du stage");
-        $mise_stage->getCellByColumnAndRow(16,1)->setValue("Ecole du stage");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Ville du stage");
+        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ecole du stage");
 
        
 

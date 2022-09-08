@@ -244,7 +244,9 @@ class AgentFormationController extends Controller
 
     public function formImport()
     {
-        return view('admin.agentFormation.formImport_agents');
+        $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+        $structures = Level::where('id_type',$id_structure->id)->get();
+        return view('admin.agentFormation.formImport_agents',compact('structures'));
     }
 
 
@@ -264,17 +266,18 @@ class AgentFormationController extends Controller
         }
         else
         {
+            
             $spreadsheet = IOFactory::load($file);
 
             $agentsheet = $spreadsheet->getSheet(0);
 
             $numberOfRow = $agentsheet->getHighestRow();
-  
+            
             // $highestColumn = $domainsheet->getHighestColumn(); // e.g 'F'
             // $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // e.g. 5
 
 
-
+            //dd($numberOfRow);
             for($i = 2; $i <= $numberOfRow; $i++)
             {
                 $currentMatricule = $agentsheet->getCellByColumnAndRow(1,$i)->getValue();
@@ -286,7 +289,7 @@ class AgentFormationController extends Controller
                 $corps = $agentsheet->getCellByColumnAndRow(7,$i)->getValue();
                 $structure = $agentsheet->getCellByColumnAndRow(8,$i)->getValue();
                 $plan = $agentsheet->getCellByColumnAndRow(9,$i)->getValue();
-
+                
                 if($plan instanceof RichText)
                 {
                     $plan = $plan->getPlainText();
@@ -295,7 +298,9 @@ class AgentFormationController extends Controller
                 {
                     $plan = (string)$plan;
                 }
-
+                
+                
+                /* Statut */ 
                 if($status instanceof RichText)
                 {
                     $status = $status->getPlainText();
@@ -303,6 +308,12 @@ class AgentFormationController extends Controller
                 else
                 {
                     $status = (string)$status;
+                }
+                //Formating
+                $id_status =  DB::table('type')->select('id')->where('wording','Statut')->first();
+                $isStatus = Level::where('id_type',$id_status->id)->where('wording',$status)->first();
+                if($isStatus == null){
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
@@ -314,7 +325,14 @@ class AgentFormationController extends Controller
                 {
                     $cate = (string)$cate;
                 }
-
+                //Formating
+                $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
+                $isCat = Level::where('id_type',$id_cat->id)->where('wording',$cate)->first();
+                if($isCat == null){
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
+                
+                
 
                 if($corps instanceof RichText)
                 {
@@ -323,6 +341,12 @@ class AgentFormationController extends Controller
                 else
                 {
                     $corps = (string)$corps;
+                }
+                // Formating
+                $id_corps = DB::table('type')->select('id')->where('wording','Corps de la fonction publique')->first();
+                $isCorps = Level::where('id_type',$id_corps->id)->where('wording',$corps)->first();
+                if($isCorps == null){
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
@@ -333,6 +357,12 @@ class AgentFormationController extends Controller
                 else
                 {
                     $structure = (string)$structure;
+                }
+                // Formating
+                $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+                $isStruct = Level::where('id_type',$id_structure->id)->where('wording',$structure)->first();
+                if($isStruct == null){
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
 
                 if($currentDiplome instanceof RichText)
@@ -354,6 +384,14 @@ class AgentFormationController extends Controller
                     $currentSexe = (string)$currentSexe;
                 }
 
+                //Formating
+                $id_sexe =  DB::table('type')->select('id')->where('wording','Sexe')->first();    
+                $isSexe = Level::where('id_type',$id_sexe->id)->where('wording',$currentSexe)->first();
+                if($isSexe == null){
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
+                
+
                 if($currentName instanceof RichText)
                 {
                     $currentName = $currentName->getPlainText();
@@ -361,6 +399,10 @@ class AgentFormationController extends Controller
                 else
                 {
                     $currentName = (string)$currentName;
+                }
+                //Formating
+                if($currentName == "null" || $currentName == null){
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
@@ -373,11 +415,11 @@ class AgentFormationController extends Controller
                     $currentMatricule = (string)$currentMatricule;
                 }
                 if($this->agentExist($currentMatricule))
-                {
+                {   
                     $linesWithError[] = $i;
                 }
                 else
-                {
+                {   
                     $agent = new AgentFormation;
                     $agent->matricule = $currentMatricule;
                     $agent->sexe = $currentSexe;

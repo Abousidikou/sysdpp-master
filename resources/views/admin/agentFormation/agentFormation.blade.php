@@ -158,7 +158,6 @@
                         
                         <form id="aggregat" method="POST" action="{{ route('aggregat.genererAggregat') }}">
                         {{csrf_field()}}
-                        {{csrf_field()}}
                         <div class="modal-body">
                                 <div class="form-group">
                                     <label for="indicator">Selectionner l'indicateur</label><br>

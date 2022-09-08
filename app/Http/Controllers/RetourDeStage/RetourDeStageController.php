@@ -154,7 +154,9 @@ class RetourDeStageController extends Controller
 
     public function form_import()
     {
-        return view('admin.retour_stage.form_import');
+        $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+        $structures = Level::where('id_type',$id_structure->id)->get();
+        return view('admin.retour_stage.form_import',compact('structures'));
     }
 
 
@@ -186,14 +188,14 @@ class RetourDeStageController extends Controller
             for($i = 2; $i <= $numberOfRow; $i++)
             {
                 $currentMatricule = $retour_stage->getCellByColumnAndRow(1,$i)->getValue();
-                $numero_decision_rs = $retour_stage->getCellByColumnAndRow(4,$i)->getValue();
-                $date_signature = $retour_stage->getCellByColumnAndRow(5,$i)->getValue();
-                $date_fin_formation =  $retour_stage->getCellByColumnAndRow(6,$i)->getValue();
-                $date_reprise_service = $retour_stage->getCellByColumnAndRow(7,$i)->getValue();
-                $categorie_rs = $retour_stage->getCellByColumnAndRow(8,$i)->getValue();
-                $annee_rs = $retour_stage->getCellByColumnAndRow(9,$i)->getValue();
-                $incidence_bn = $retour_stage->getCellByColumnAndRow(10,$i)->getValue();
-                $structure_rs = $retour_stage->getCellByColumnAndRow(11,$i)->getValue();
+                $numero_decision_rs = $retour_stage->getCellByColumnAndRow(3,$i)->getValue();
+                $date_signature = $retour_stage->getCellByColumnAndRow(4,$i)->getValue();
+                $date_fin_formation =  $retour_stage->getCellByColumnAndRow(5,$i)->getValue();
+                $date_reprise_service = $retour_stage->getCellByColumnAndRow(6,$i)->getValue();
+                $categorie_rs = $retour_stage->getCellByColumnAndRow(7,$i)->getValue();
+                $annee_rs = $retour_stage->getCellByColumnAndRow(8,$i)->getValue();
+                $incidence_bn = $retour_stage->getCellByColumnAndRow(9,$i)->getValue();
+                $structure_rs = $retour_stage->getCellByColumnAndRow(10,$i)->getValue();
 
                 //dd($country,$state,$city);
 
@@ -205,6 +207,12 @@ class RetourDeStageController extends Controller
                 {
                     $categorie_rs = (string)$categorie_rs;
                 }
+                //Formating
+                $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
+                $isCat = Level::where('id_type',$id_cat->id)->where('wording',$categorie_rs)->first();
+                if($isCat == null){
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
 
                 if($annee_rs instanceof RichText)
                 {
@@ -214,6 +222,10 @@ class RetourDeStageController extends Controller
                 {
                     $annee_rs = (string)$annee_rs;
                 }
+                //Formation
+                if (strtotime($annee_rs) === false) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                  }
 
                 if($structure_rs instanceof RichText)
                 {
@@ -222,6 +234,12 @@ class RetourDeStageController extends Controller
                 else
                 {
                     $structure_rs = (string)$structure_rs;
+                }
+                //Formating
+                $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+                $isStruct = Level::where('id_type',$id_structure->id)->where('wording',$structure_rs)->first();
+                if($isStruct == null){
+                    return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
@@ -403,30 +421,28 @@ class RetourDeStageController extends Controller
         $datasetname = "retour_de_stage";
         $retour_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $retour_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
-        $retour_stage->getCellByColumnAndRow(3,1)->setValue("Structure MS");
-        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Numéro de decision de retour de stage");
-        $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date signature de mise en stage");
-        $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de fin de formation");
-        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Date de reprise de service");
-        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Catégorie RS");
-        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Année RS");
-        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Incidence BN");
-        $retour_stage->getCellByColumnAndRow(11,1)->setValue("Structure RS");
+        $retour_stage->getCellByColumnAndRow(3,1)->setValue("Numéro de decision de retour de stage");
+        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Date signature de mise en stage");
+        $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date de fin de formation");
+        $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de reprise de service");
+        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Catégorie RS");
+        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Année RS");
+        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Incidence BN");
+        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Structure RS");
 
         $i = 2;
         foreach($mise_r as $mise)
         {
             $retour_stage->getCellByColumnAndRow(1,$i)->setValue($mise->agent->matricule);
             $retour_stage->getCellByColumnAndRow(2,$i)->setValue($mise->agent->nom_prenoms);
-            $retour_stage->getCellByColumnAndRow(3,$i)->setValue($mise->agent->structure);
-            $retour_stage->getCellByColumnAndRow(4,$i)->setValue($mise->numero_decision_rs);
-            $retour_stage->getCellByColumnAndRow(5,$i)->setValue($mise->date_signature);
-            $retour_stage->getCellByColumnAndRow(6,$i)->setValue($mise->date_fin_formation);
-            $retour_stage->getCellByColumnAndRow(7,$i)->setValue($mise->date_reprise_service);
-            $retour_stage->getCellByColumnAndRow(8,$i)->setValue($mise->categorie_rs);
-            $retour_stage->getCellByColumnAndRow(9,$i)->setValue($mise->annee_rs);
-            $retour_stage->getCellByColumnAndRow(10,$i)->setValue($mise->incidence_bn);
-            $retour_stage->getCellByColumnAndRow(11,$i)->setValue($mise->structure_rs);
+            $retour_stage->getCellByColumnAndRow(3,$i)->setValue($mise->numero_decision_rs);
+            $retour_stage->getCellByColumnAndRow(4,$i)->setValue($mise->date_signature);
+            $retour_stage->getCellByColumnAndRow(5,$i)->setValue($mise->date_fin_formation);
+            $retour_stage->getCellByColumnAndRow(6,$i)->setValue($mise->date_reprise_service);
+            $retour_stage->getCellByColumnAndRow(7,$i)->setValue($mise->categorie_rs);
+            $retour_stage->getCellByColumnAndRow(8,$i)->setValue($mise->annee_rs);
+            $retour_stage->getCellByColumnAndRow(9,$i)->setValue($mise->incidence_bn);
+            $retour_stage->getCellByColumnAndRow(10,$i)->setValue($mise->structure_rs);
             $i++;
         }
 
@@ -447,15 +463,14 @@ class RetourDeStageController extends Controller
         $datasetname = "retour_de_stage";
         $retour_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $retour_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
-        $retour_stage->getCellByColumnAndRow(3,1)->setValue("Structure MS");
-        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Numéro de decision de retour de stage");
-        $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date signature de mise en stage");
-        $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de fin de formation");
-        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Date de reprise de service");
-        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Catégorie RS");
-        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Année RS");
-        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Incidence BN");
-        $retour_stage->getCellByColumnAndRow(11,1)->setValue("Structure RS");
+        $retour_stage->getCellByColumnAndRow(3,1)->setValue("Numéro de decision de retour de stage");
+        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Date signature de mise en stage");
+        $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date de fin de formation");
+        $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de reprise de service");
+        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Catégorie RS");
+        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Année RS");
+        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Incidence BN");
+        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Structure RS");
 
 
         $spreadsheet->setActiveSheetIndex(0);
