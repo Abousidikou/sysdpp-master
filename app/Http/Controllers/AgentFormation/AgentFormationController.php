@@ -558,7 +558,9 @@ class AgentFormationController extends Controller
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
-
+                if ($cateCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($cateCode instanceof RichText)
                 {
                     $cateCode = $cateCode->getPlainText();
@@ -574,7 +576,9 @@ class AgentFormationController extends Controller
                 }
                 
                 
-
+                if ($corpsCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($corpsCode instanceof RichText)
                 {
                     $corpsCode = $corpsCode->getPlainText();
@@ -589,7 +593,9 @@ class AgentFormationController extends Controller
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
-
+                if ($structureCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($structureCode instanceof RichText)
                 {
                     $structureCode = $structureCode->getPlainText();
@@ -604,6 +610,7 @@ class AgentFormationController extends Controller
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
+
                 if($currentDiplome instanceof RichText)
                 {
                     $currentDiplome = $currentDiplome->getPlainText();
@@ -615,6 +622,9 @@ class AgentFormationController extends Controller
 
 
                 //Formating   
+                if ($sexeCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 $sexe = Level::where('id',$sexeCode)->first();
                 if($sexe == null){
                     return redirect()->back()->with('nomenclatureError','error');

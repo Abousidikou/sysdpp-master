@@ -235,18 +235,23 @@ class MiseEnStageController extends Controller
 
                 //dd($country,$state,$city);
 
-                if($isBoursier instanceof RichText)
-                {
-                    $isBoursier = $isBoursier->getPlainText();
+                if ($isBoursier != null) {
+                    if($isBoursier instanceof RichText)
+                    {
+                        $isBoursier = $isBoursier->getPlainText();
+                    }
+                    else
+                    {
+                        $isBoursier = (string)$isBoursier;
+                    }
+                    //Test
+                    if ($isBoursier != "1" && $isBoursier != "0") {
+                        return redirect()->back()->with('nomenclatureError','error');
+                    } 
+                } else {
+                    $isBoursier = 0;
                 }
-                else
-                {
-                    $isBoursier = (string)$isBoursier;
-                }
-                //Test
-                if ($isBoursier != "1" && $isBoursier != "0") {
-                    return redirect()->back()->with('nomenclatureError','error');
-                } 
+                
 
                 if($spec_option instanceof RichText)
                 {
@@ -257,7 +262,9 @@ class MiseEnStageController extends Controller
                     $spec_option = (string)$spec_option;
                 }
 
-
+                if ($cityCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($cityCode instanceof RichText)
                 {
                     $cityCode = $cityCode->getPlainText();
@@ -296,7 +303,9 @@ class MiseEnStageController extends Controller
                 }
 
 
-
+                if ($anneeCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($anneeCode instanceof RichText)
                 {
                     $anneeCode = $anneeCode->getPlainText();

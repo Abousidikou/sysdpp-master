@@ -201,50 +201,68 @@ class RetourDeStageController extends Controller
                 $incidence_bn = $retour_stage->getCellByColumnAndRow(11,$i)->getValue();
                 $structureCode = $retour_stage->getCellByColumnAndRow(12,$i)->getValue();
 
+                $categorie = "";
+                if ($categorieCode != null) {
+                    if($categorieCode instanceof RichText)
+                    {
+                        $categorieCode = $categorieCode->getPlainText();
+                    }
+                    else
+                    {
+                        $categorieCode = (int)$categorieCode;
+                    }
+                    //Formating
+                    
+                    $cat = Level::where('id',$categorieCode)->first();
+                    if($cat == null){
+                        return redirect()->back()->with('nomenclatureError','error');
+                    }
+                    $categorie = $cat->wording;
+                }else {
+                    $categorie = "null";
+                }
+                
+                $ann = "";
+                if ($anneeCode  != null) {
+                    if($anneeCode instanceof RichText)
+                    {
+                        $anneeCode = $anneeCode->getPlainText();
+                    }
+                    else
+                    {
+                        $anneeCode = (string)$anneeCode;
+                    }
+                    //Formation
+                    $annee = DB::table('annee')->where('id',$anneeCode)->first();
+                    if ($annee == null) {
+                        return redirect()->back()->with('nomenclatureError','error');
+                    }
+                    $ann = $annee->value;
+                } else {
+                    $ann == "null";
+                }
                 
 
-                if($categorieCode instanceof RichText)
-                {
-                    $categorieCode = $categorieCode->getPlainText();
-                }
-                else
-                {
-                    $categorieCode = (int)$categorieCode;
-                }
-                //Formating
-                $cat = Level::where('id',$categorieCode)->first();
-                if($cat == null){
-                    return redirect()->back()->with('nomenclatureError','error');
-                }
 
-                if($anneeCode instanceof RichText)
-                {
-                    $anneeCode = $anneeCode->getPlainText();
+                if ($structureCode != null) {
+                    if($structureCode instanceof RichText)
+                    {
+                        $structureCode = $structureCode->getPlainText();
+                    }
+                    else
+                    {
+                        $structureCode = (string)$structureCode;
+                    }
+                    // Formating
+                    $struct = Level::where('id',$structureCode)->first();
+                    if($struct == null){
+                        return redirect()->back()->with('nomenclatureError','error');
+                    }
+                    $structureName = $struct->wording;
+                } else {
+                    $structureName = "null";
                 }
-                else
-                {
-                    $anneeCode = (string)$anneeCode;
-                }
-                //Formation
-                $annee = DB::table('annee')->where('id',$anneeCode)->first();
-                if ($annee == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
-                }
-
-
-                if($structureCode instanceof RichText)
-                {
-                    $structureCode = $structureCode->getPlainText();
-                }
-                else
-                {
-                    $structureCode = (string)$structureCode;
-                }
-                // Formating
-                $struct = Level::where('id',$structureCode)->first();
-                if($struct == null){
-                    return redirect()->back()->with('nomenclatureError','error');
-                }
+                
 
 
                 if($incidence_bn instanceof RichText)
@@ -316,10 +334,10 @@ class RetourDeStageController extends Controller
                     $mise_r->date_signature = $date_signature;
                     $mise_r->date_fin_formation = $date_fin_formation;
                     $mise_r->date_reprise_service = $date_reprise_service;
-                    $mise_r->categorie_rs = $cat->wording;
-                    $mise_r->annee_rs = $annee->value;
+                    $mise_r->categorie_rs = $categorie;
+                    $mise_r->annee_rs = $ann;
                     $mise_r->incidence_bn = $incidence_bn;
-                    $mise_r->structure_rs = $struct->wording;
+                    $mise_r->structure_rs = $structureName;
                     if($mise_r->save())
                     {
                         continue;
