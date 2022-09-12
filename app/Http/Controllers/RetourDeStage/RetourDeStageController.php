@@ -444,7 +444,7 @@ class RetourDeStageController extends Controller
         $retour_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $retour_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
         $retour_stage->getCellByColumnAndRow(3,1)->setValue("Numéro de decision de retour de stage");
-        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Date signature de mise en stage");
+        $retour_stage->getCellByColumnAndRow(4,1)->setValue("Date signature de retour en stage");
         $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date de fin de formation");
         $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de reprise de service");
         $retour_stage->getCellByColumnAndRow(7,1)->setValue("Catégorie RS");

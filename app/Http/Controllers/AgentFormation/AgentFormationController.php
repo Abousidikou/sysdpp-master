@@ -267,7 +267,6 @@ class AgentFormationController extends Controller
         $i = 2;
         foreach($structures as $structure)
         {
-            if($structure->wording == "null" ) continue;
             $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($structure->id);
             $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($structure->wording);
             $i++;
@@ -292,7 +291,6 @@ class AgentFormationController extends Controller
         $i = 2;
         foreach($categories as $categorie)
         {
-            if($categorie->wording == "null" ) continue;
             $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($categorie->id);
             $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($categorie->wording);
             $i++;
@@ -316,7 +314,6 @@ class AgentFormationController extends Controller
         $i = 2;
         foreach($corps as $cor)
         {
-            if($cor->wording == "null" ) continue;
             $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($cor->id);
             $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($cor->wording);
             $i++;
@@ -340,7 +337,6 @@ class AgentFormationController extends Controller
         $i = 2;
         foreach($statuts as $statut)
         {
-            if($statut->wording == "null" ) continue;
             $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($statut->id);
             $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($statut->wording);
             $i++;
@@ -408,7 +404,6 @@ class AgentFormationController extends Controller
         $i = 2;
         foreach($sexes as $sexe)
         {
-            if($sexe->wording == "null" ) continue;
             $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($sexe->id);
             $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($sexe->wording);
             $i++;
@@ -544,6 +539,9 @@ class AgentFormationController extends Controller
                 
                 
                 /* Statut */ 
+                if ($statusCode == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
                 if($statusCode instanceof RichText)
                 {
                     $statusCode = $statusCode->getPlainText();
@@ -552,11 +550,9 @@ class AgentFormationController extends Controller
                 {
                     $statusCode = (string)$statusCode;
                 }
-                //Formating
                 $status = Level::where('id',$statusCode)->first();
-                if($status == null){
-                    return redirect()->back()->with('nomenclatureError','error');
-                }
+
+                /* Categorie */ 
 
                 if ($cateCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
@@ -569,13 +565,9 @@ class AgentFormationController extends Controller
                 {
                     $cateCode = (string)$cateCode;
                 }
-                //Formating
                 $cat = Level::where('id',$cateCode)->first();
-                if($cat == null){
-                    return redirect()->back()->with('nomenclatureError','error');
-                }
-                
-                
+
+                /* Corps */
                 if ($corpsCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }

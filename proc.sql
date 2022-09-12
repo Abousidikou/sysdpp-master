@@ -512,6 +512,7 @@ BEGIN
             INSERT INTO annee (value) VALUES (row_count) ;
             SET row_count = row_count + 1;
     END WHILE;
+    INSERT INTO annee (value) VALUES ("null") ;
 End$$
 DELIMITER ;
 
