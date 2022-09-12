@@ -11,6 +11,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use App\Http\Controllers\AgentFormation\AgentFormationController;
+use App\Http\Controllers\MiseEnStage\MiseEnStageController;
 use App\Models\RetourDeStage;
 use App\Models\MiseEnStage;
 use App\Models\Structures;
@@ -178,7 +180,8 @@ class RetourDeStageController extends Controller
         {
             $spreadsheet = IOFactory::load($file);
 
-            $retour_stage = $spreadsheet->getSheet(0);
+            $numberOfSheet = $spreadsheet->getSheetCount();
+            $retour_stage = $spreadsheet->getSheet(($numberOfSheet-1));
 
             $numberOfRow = $retour_stage->getHighestRow();
   
@@ -187,58 +190,59 @@ class RetourDeStageController extends Controller
 
             for($i = 2; $i <= $numberOfRow; $i++)
             {
+                
                 $currentMatricule = $retour_stage->getCellByColumnAndRow(1,$i)->getValue();
                 $numero_decision_rs = $retour_stage->getCellByColumnAndRow(3,$i)->getValue();
                 $date_signature = $retour_stage->getCellByColumnAndRow(4,$i)->getValue();
                 $date_fin_formation =  $retour_stage->getCellByColumnAndRow(5,$i)->getValue();
                 $date_reprise_service = $retour_stage->getCellByColumnAndRow(6,$i)->getValue();
-                $categorie_rs = $retour_stage->getCellByColumnAndRow(7,$i)->getValue();
-                $annee_rs = $retour_stage->getCellByColumnAndRow(8,$i)->getValue();
-                $incidence_bn = $retour_stage->getCellByColumnAndRow(9,$i)->getValue();
-                $structure_rs = $retour_stage->getCellByColumnAndRow(10,$i)->getValue();
+                $categorieCode = $retour_stage->getCellByColumnAndRow(7,$i)->getValue();
+                $anneeCode = $retour_stage->getCellByColumnAndRow(9,$i)->getValue();
+                $incidence_bn = $retour_stage->getCellByColumnAndRow(11,$i)->getValue();
+                $structureCode = $retour_stage->getCellByColumnAndRow(12,$i)->getValue();
 
-                //dd($country,$state,$city);
+                
 
-                if($categorie_rs instanceof RichText)
+                if($categorieCode instanceof RichText)
                 {
-                    $categorie_rs = $categorie_rs->getPlainText();
+                    $categorieCode = $categorieCode->getPlainText();
                 }
                 else
                 {
-                    $categorie_rs = (string)$categorie_rs;
+                    $categorieCode = (int)$categorieCode;
                 }
                 //Formating
-                $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
-                $isCat = Level::where('id_type',$id_cat->id)->where('wording',$categorie_rs)->first();
-                if($isCat == null){
+                $cat = Level::where('id',$categorieCode)->first();
+                if($cat == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
-                if($annee_rs instanceof RichText)
+                if($anneeCode instanceof RichText)
                 {
-                    $annee_rs = $annee_rs->getPlainText();
+                    $anneeCode = $anneeCode->getPlainText();
                 }
                 else
                 {
-                    $annee_rs = (string)$annee_rs;
+                    $anneeCode = (string)$anneeCode;
                 }
                 //Formation
-                if (strtotime($annee_rs) === false) {
+                $annee = DB::table('annee')->where('id',$anneeCode)->first();
+                if ($annee == null) {
                     return redirect()->back()->with('nomenclatureError','error');
-                  }
+                }
 
-                if($structure_rs instanceof RichText)
+
+                if($structureCode instanceof RichText)
                 {
-                    $structure_rs = $structure_rs->getPlainText();
+                    $structureCode = $structureCode->getPlainText();
                 }
                 else
                 {
-                    $structure_rs = (string)$structure_rs;
+                    $structureCode = (string)$structureCode;
                 }
-                //Formating
-                $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
-                $isStruct = Level::where('id_type',$id_structure->id)->where('wording',$structure_rs)->first();
-                if($isStruct == null){
+                // Formating
+                $struct = Level::where('id',$structureCode)->first();
+                if($struct == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
@@ -312,10 +316,10 @@ class RetourDeStageController extends Controller
                     $mise_r->date_signature = $date_signature;
                     $mise_r->date_fin_formation = $date_fin_formation;
                     $mise_r->date_reprise_service = $date_reprise_service;
-                    $mise_r->categorie_rs = $request->categorie_rs;
-                    $mise_r->annee_rs = $request->annee_rs;
+                    $mise_r->categorie_rs = $cat->wording;
+                    $mise_r->annee_rs = $annee->value;
                     $mise_r->incidence_bn = $incidence_bn;
-                    $mise_r->structure_rs = $structure_rs;
+                    $mise_r->structure_rs = $struct->wording;
                     if($mise_r->save())
                     {
                         continue;
@@ -456,10 +460,59 @@ class RetourDeStageController extends Controller
         return redirect()->back()->with("path","template/$datasetname.xlsx");
     }
 
+
+    public function buildoldRetour(Spreadsheet $spreadsheet){
+        $datasetSheet = new Worksheet($spreadsheet,'Liste Retours en Stage');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+
+        
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Matricule");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
+        $datasetSheet->getCellByColumnAndRow(3,1)->setValue("Numéro de decision de retour de stage");
+        $datasetSheet->getCellByColumnAndRow(4,1)->setValue("Date signature de mise en stage");
+        $datasetSheet->getCellByColumnAndRow(5,1)->setValue("Date de fin de formation");
+        $datasetSheet->getCellByColumnAndRow(6,1)->setValue("Date de reprise de service");
+        $datasetSheet->getCellByColumnAndRow(7,1)->setValue("Catégorie RS");
+        $datasetSheet->getCellByColumnAndRow(8,1)->setValue("Année RS");
+        $datasetSheet->getCellByColumnAndRow(9,1)->setValue("Incidence BN");
+        $datasetSheet->getCellByColumnAndRow(10,1)->setValue("Structure RS");
+
+        $mise_r = RetourDeStage::all();
+        $i = 2;
+        foreach($mise_r as $mise)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($mise->agent->matricule);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($mise->agent->nom_prenoms);
+            $datasetSheet->getCellByColumnAndRow(3,$i)->setValue($mise->numero_decision_rs);
+            $datasetSheet->getCellByColumnAndRow(4,$i)->setValue($mise->date_signature);
+            $datasetSheet->getCellByColumnAndRow(5,$i)->setValue($mise->date_fin_formation);
+            $datasetSheet->getCellByColumnAndRow(6,$i)->setValue($mise->date_reprise_service);
+            $datasetSheet->getCellByColumnAndRow(7,$i)->setValue($mise->categorie_rs);
+            $datasetSheet->getCellByColumnAndRow(8,$i)->setValue($mise->annee_rs);
+            $datasetSheet->getCellByColumnAndRow(9,$i)->setValue($mise->incidence_bn);
+            $datasetSheet->getCellByColumnAndRow(10,$i)->setValue($mise->structure_rs);
+            $i++;
+        }
+
+
+        return $spreadsheet;
+    }
+
     public function genererExp()
     {
         $spreadsheet = new Spreadsheet();
+        $build = new AgentFormationController();
+        $buildMise = new MiseEnStageController();
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet = $this->buildoldRetour($spreadsheet);
+        $spreadsheet = $buildMise->buildoldMise($spreadsheet);
+        $spreadsheet = $build->buildAnnee($spreadsheet);
+        $spreadsheet = $build->buildCategorie($spreadsheet);
+        $spreadsheet = $build->buildStructure($spreadsheet);
         $retour_stage = $spreadsheet->getActiveSheet();
+        $retour_stage->setTitle("retour_de_stage");
         $datasetname = "retour_de_stage";
         $retour_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $retour_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
@@ -467,10 +520,13 @@ class RetourDeStageController extends Controller
         $retour_stage->getCellByColumnAndRow(4,1)->setValue("Date signature de mise en stage");
         $retour_stage->getCellByColumnAndRow(5,1)->setValue("Date de fin de formation");
         $retour_stage->getCellByColumnAndRow(6,1)->setValue("Date de reprise de service");
-        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Catégorie RS");
-        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Année RS");
-        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Incidence BN");
-        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Structure RS");
+        $retour_stage->getCellByColumnAndRow(7,1)->setValue("Catégorie Code");
+        $retour_stage->getCellByColumnAndRow(8,1)->setValue("Catégorie RS");
+        $retour_stage->getCellByColumnAndRow(9,1)->setValue("Année Code ");
+        $retour_stage->getCellByColumnAndRow(10,1)->setValue("Année RS");
+        $retour_stage->getCellByColumnAndRow(11,1)->setValue("Incidence BN");
+        $retour_stage->getCellByColumnAndRow(12,1)->setValue("StructureCode");
+        $retour_stage->getCellByColumnAndRow(13,1)->setValue("Structure RS");
 
 
         $spreadsheet->setActiveSheetIndex(0);

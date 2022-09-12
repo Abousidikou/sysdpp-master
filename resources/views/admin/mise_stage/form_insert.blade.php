@@ -93,6 +93,15 @@
                                 <div class="help-info"></div>
                             </div>
 
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <input class="form-check-input" type="checkbox" name="isBoursier" id="flexCheckChecked" checked>
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Checked checkbox
+                                    </label>
+                                </div>
+                                <div class="help-info"></div>
+                            </div>
 
                             <div class="form-group form-float">
                                 <div class="form-line">

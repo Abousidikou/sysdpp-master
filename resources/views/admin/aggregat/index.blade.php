@@ -113,7 +113,7 @@
                             
                                 <div class="col-md-3">
                                     <label class="form-label"><small> Année du stage</small> </label><br>
-                                    <select name="annee[]" class="form-control show-tick" data-live-search="true" id="annee_stage" required>
+                                    <select name="annee[]" class="form-control show-tick" data-live-search="true" id="annee_stage" multiple required>
                                         @foreach ($ann as $an)
                                         <option value="{{ $an }}" style="background:#919c9e; color: #fff;" >{{ $an }}</option>
                                         @endforeach

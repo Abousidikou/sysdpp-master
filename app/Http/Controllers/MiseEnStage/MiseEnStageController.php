@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\AgentFormation\AgentFormationController;
 use App\Models\AgentFormation;
 use App\Models\Level;
 use App\Models\{Country,State,City};
@@ -53,6 +54,12 @@ class MiseEnStageController extends Controller
         $rules = [
             'id_agent' =>'required'
         ];
+        $isBoursier = true;
+        if($request->has('isBoursier')){
+            $isBoursier = true;
+        }else{
+            $isBoursier = false;
+        }
         $valid = MiseEnStage::where('id_agent',$request->id_agent)->first();
         $validator = Validator::make($request->all(), $rules);
         if($validator->fails() || $valid != null)
@@ -70,6 +77,7 @@ class MiseEnStageController extends Controller
             $mise_s->id_agent = $request->id_agent;
             $mise_s->numero_decision_ms = $request->numero_decision_ms;
             $mise_s->date_signature = $request->date_signature;
+            $mise_s->isBoursier = $isBoursier;
             $mise_s->nature_bourse = $request->nature_bourse;
             $mise_s->date_demarrage_stage = $request->date_demarrage_stage;
             $mise_s->niveau = $request->niveau;
@@ -141,9 +149,16 @@ class MiseEnStageController extends Controller
         else
         {
             $mise_s =  MiseEnStage::where('id',$request->id)->first();
+            $isBoursier = true;
+            if($request->has('isBoursier')){
+                $isBoursier = true;
+            }else{
+                $isBoursier = false;
+            }
             $mise_s->id_agent = $request->id_agent;
             $mise_s->numero_decision_ms = $request->numero_decision_ms;
             $mise_s->date_signature = $request->date_signature;
+            $mise_s->isBoursier = $isBoursier;
             $mise_s->nature_bourse = $request->nature_bourse;
             $mise_s->date_demarrage_stage = $request->date_demarrage_stage;
             $mise_s->niveau = $request->niveau;
@@ -194,29 +209,44 @@ class MiseEnStageController extends Controller
         {
             $spreadsheet = IOFactory::load($file);
 
-            $mise_stage = $spreadsheet->getSheet(0);
+            $numberOfSheet = $spreadsheet->getSheetCount();
+            $mise_stage = $spreadsheet->getSheet(($numberOfSheet-1));
 
             $numberOfRow = $mise_stage->getHighestRow();
-  
+            
             // $highestColumn = $domainsheet->getHighestColumn(); // e.g 'F'
             // $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // e.g. 5
 
             for($i = 2; $i <= $numberOfRow; $i++)
             {
                 $currentMatricule = $mise_stage->getCellByColumnAndRow(1,$i)->getValue();
-                $date_signature = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
-                $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(5,$i)->getValue();
-                $numero_decision_ms = $mise_stage->getCellByColumnAndRow(6,$i)->getValue();
+                $date_signature = $mise_stage->getCellByColumnAndRow(3,$i)->getValue();
+                $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
+                $numero_decision_ms = $mise_stage->getCellByColumnAndRow(5,$i)->getValue();
+                $isBoursier = $mise_stage->getCellByColumnAndRow(6,$i)->getValue();
                 $nature_bourse = $mise_stage->getCellByColumnAndRow(7,$i)->getValue();
                 $duree = $mise_stage->getCellByColumnAndRow(8,$i)->getValue();
-                $annee = $mise_stage->getCellByColumnAndRow(9,$i)->getValue();
-                $niveau = $mise_stage->getCellByColumnAndRow(10,$i)->getValue();
-                $filiere = $mise_stage->getCellByColumnAndRow(11,$i)->getValue();
-                $spec_option = $mise_stage->getCellByColumnAndRow(12,$i)->getValue();
-                $city = $mise_stage->getCellByColumnAndRow(14,$i)->getValue();
-                $ecole_stage = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
+                $anneeCode = $mise_stage->getCellByColumnAndRow(9,$i)->getValue();
+                $niveau = $mise_stage->getCellByColumnAndRow(11,$i)->getValue();
+                $filiere = $mise_stage->getCellByColumnAndRow(12,$i)->getValue();
+                $spec_option = $mise_stage->getCellByColumnAndRow(13,$i)->getValue();
+                $cityCode = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
+                $ecole_stage = $mise_stage->getCellByColumnAndRow(17,$i)->getValue();
 
                 //dd($country,$state,$city);
+
+                if($isBoursier instanceof RichText)
+                {
+                    $isBoursier = $isBoursier->getPlainText();
+                }
+                else
+                {
+                    $isBoursier = (string)$isBoursier;
+                }
+                //Test
+                if ($isBoursier != "1" && $isBoursier != "0") {
+                    return redirect()->back()->with('nomenclatureError','error');
+                } 
 
                 if($spec_option instanceof RichText)
                 {
@@ -228,17 +258,17 @@ class MiseEnStageController extends Controller
                 }
 
 
-                if($city instanceof RichText)
+                if($cityCode instanceof RichText)
                 {
-                    $city = $city->getPlainText();
+                    $cityCode = $cityCode->getPlainText();
                 }
                 else
                 {
-                    $city = (string)$city;
+                    $cityCode = (string)$cityCode;
                 }
 
                 // appel a model 
-                $city = City::where('name',$city)->first();
+                $city = City::where('id',$cityCode)->first();
                 if ($city == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
@@ -267,15 +297,19 @@ class MiseEnStageController extends Controller
 
 
 
-                if($annee instanceof RichText)
+                if($anneeCode instanceof RichText)
                 {
-                    $annee = $annee->getPlainText();
+                    $anneeCode = $anneeCode->getPlainText();
                 }
                 else
                 {
-                    $annee = (string)$annee;
+                    $anneeCode = (string)$anneeCode;
                 }
-
+                // appel a model 
+                $annee = DB::table('annee')->where('id',$anneeCode)->first();
+                if ($annee == null) {
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
 
                 if($duree instanceof RichText)
                 {
@@ -344,6 +378,7 @@ class MiseEnStageController extends Controller
                     $mise_s->id_agent = $id_agent->id;
                     $mise_s->numero_decision_ms = $numero_decision_ms;
                     $mise_s->date_signature = $date_signature;
+                    $mise_s->isBoursier = $isBoursier;
                     $mise_s->nature_bourse = $nature_bourse;
                     $mise_s->date_demarrage_stage = $date_demarrage_stage;
                     $mise_s->niveau = $niveau;
@@ -351,7 +386,7 @@ class MiseEnStageController extends Controller
                     $mise_s->spec_option = $spec_option;
                     $mise_s->ecole_stage = $ecole_stage;
                     $mise_s->duree = $duree;
-                    $mise_s->duree = $annee;
+                    $mise_s->annee_stage = $annee->value;
                     $mise_s->pays_stage_id = $country->id;
                     $mise_s->region_stage_id = $state->id;
                     $mise_s->ville_stage_id = $city->id;
@@ -462,10 +497,10 @@ class MiseEnStageController extends Controller
         $datasetname = "mise_en_stage";
         $mise_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $mise_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
-        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Structure");
-        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de signature de mise en stage");
-        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Date de démarrage du stage");
-        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Date de signature de mise en stage");
+        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de démarrage du stage");
+        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Est Boursier ?(0 ou 1)");
         $mise_stage->getCellByColumnAndRow(7,1)->setValue("Nature de la bourse");
         $mise_stage->getCellByColumnAndRow(8,1)->setValue("Durée du stage");
         $mise_stage->getCellByColumnAndRow(9,1)->setValue("Année du stage");
@@ -481,10 +516,10 @@ class MiseEnStageController extends Controller
         {
             $mise_stage->getCellByColumnAndRow(1,$i)->setValue($mise->agent->matricule);
             $mise_stage->getCellByColumnAndRow(2,$i)->setValue($mise->agent->nom_prenoms);
-            $mise_stage->getCellByColumnAndRow(3,$i)->setValue($mise->agent->structure);
-            $mise_stage->getCellByColumnAndRow(4,$i)->setValue($mise->date_signature);
-            $mise_stage->getCellByColumnAndRow(5,$i)->setValue($mise->date_demarrage_stage);
-            $mise_stage->getCellByColumnAndRow(6,$i)->setValue($mise->numero_decision_ms);
+            $mise_stage->getCellByColumnAndRow(3,$i)->setValue($mise->date_signature);
+            $mise_stage->getCellByColumnAndRow(4,$i)->setValue($mise->date_demarrage_stage);
+            $mise_stage->getCellByColumnAndRow(5,$i)->setValue($mise->numero_decision_ms);
+            $mise_stage->getCellByColumnAndRow(6,1)->setValue($mise->isBoursier);
             $mise_stage->getCellByColumnAndRow(7,$i)->setValue($mise->nature_bourse);
             $mise_stage->getCellByColumnAndRow(8,$i)->setValue($mise->duree);
             $mise_stage->getCellByColumnAndRow(9,$i)->setValue($mise->annee);
@@ -507,29 +542,89 @@ class MiseEnStageController extends Controller
         return redirect()->back()->with("path","template/$datasetname.xlsx");
     }
 
+    public function buildoldMise(Spreadsheet $spreadsheet){
+        $datasetSheet = new Worksheet($spreadsheet,'Liste Mises en Stage');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+
+
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Matricule");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
+        $datasetSheet->getCellByColumnAndRow(3,1)->setValue("Date de signature de mise en stage");
+        $datasetSheet->getCellByColumnAndRow(4,1)->setValue("Date de démarrage du stage");
+        $datasetSheet->getCellByColumnAndRow(5,1)->setValue("Numéro de decision de mise en stage");
+        $datasetSheet->getCellByColumnAndRow(6,1)->setValue("Est Boursier ?[0 ou 1]");
+        $datasetSheet->getCellByColumnAndRow(7,1)->setValue("Nature de la bourse");
+        $datasetSheet->getCellByColumnAndRow(8,1)->setValue("Durée du stage");
+        $datasetSheet->getCellByColumnAndRow(9,1)->setValue("Année du stage");
+        $datasetSheet->getCellByColumnAndRow(10,1)->setValue("Niveau");
+        $datasetSheet->getCellByColumnAndRow(11,1)->setValue("Filière");
+        $datasetSheet->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
+        $datasetSheet->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
+        $datasetSheet->getCellByColumnAndRow(14,1)->setValue("Ville du stage");
+        $datasetSheet->getCellByColumnAndRow(15,1)->setValue("Ecole du stage");
+
+        $mise_m = MiseEnStage::all();
+        $i = 2;
+        foreach($mise_m as $mise)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($mise->agent->matricule);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($mise->agent->nom_prenoms);
+            $datasetSheet->getCellByColumnAndRow(3,$i)->setValue($mise->date_signature);
+            $datasetSheet->getCellByColumnAndRow(4,$i)->setValue($mise->date_demarrage_stage);
+            $datasetSheet->getCellByColumnAndRow(5,$i)->setValue($mise->numero_decision_ms);
+            $datasetSheet->getCellByColumnAndRow(6,$i)->setValue($mise->isBoursier);
+            $datasetSheet->getCellByColumnAndRow(7,$i)->setValue($mise->nature_bourse);
+            $datasetSheet->getCellByColumnAndRow(8,$i)->setValue($mise->duree);
+            $datasetSheet->getCellByColumnAndRow(9,$i)->setValue($mise->annee);
+            $datasetSheet->getCellByColumnAndRow(10,$i)->setValue($mise->niveau);
+            $datasetSheet->getCellByColumnAndRow(11,$i)->setValue($mise->filiere);
+            $datasetSheet->getCellByColumnAndRow(12,$i)->setValue($mise->spec_option);
+            $datasetSheet->getCellByColumnAndRow(13,$i)->setValue($mise->country->name);
+            $datasetSheet->getCellByColumnAndRow(14,$i)->setValue($mise->city->name);
+            $datasetSheet->getCellByColumnAndRow(15,$i)->setValue($mise->ecole_stage);
+            $i++;
+        }
+
+
+        return $spreadsheet;
+    }
+
     public function genererExp()
     {
+        $build = new AgentFormationController();
         $spreadsheet = new Spreadsheet();
+        $spreadsheet = $this->buildoldMise($spreadsheet);
+        $spreadsheet = $build->buildAncienAgent($spreadsheet);
+        $spreadsheet = $build->buildAnnee($spreadsheet);
+        $spreadsheet = $build->buildCountry($spreadsheet);
+        $spreadsheet = $build->buildCity($spreadsheet);
+        $spreadsheet = $build->buildStructure($spreadsheet);
+        $spreadsheet = $build->buildCorps($spreadsheet);
         $mise_stage = $spreadsheet->getActiveSheet();
-        $datasetname = "mise_en_stage";
+        $mise_stage->setTitle('Mise en stage');
         $mise_stage->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $mise_stage->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
-        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Structure");
-        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de signature de mise en stage");
-        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Date de démarrage du stage");
-        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(3,1)->setValue("Date de signature de mise en stage");
+        $mise_stage->getCellByColumnAndRow(4,1)->setValue("Date de démarrage du stage");
+        $mise_stage->getCellByColumnAndRow(5,1)->setValue("Numéro de decision de mise en stage");
+        $mise_stage->getCellByColumnAndRow(6,1)->setValue("Est Boursier ?(0 ou 1)");
         $mise_stage->getCellByColumnAndRow(7,1)->setValue("Nature de la bourse");
         $mise_stage->getCellByColumnAndRow(8,1)->setValue("Durée du stage");
-        $mise_stage->getCellByColumnAndRow(9,1)->setValue("Année du stage");
-        $mise_stage->getCellByColumnAndRow(10,1)->setValue("Niveau");
-        $mise_stage->getCellByColumnAndRow(11,1)->setValue("Filière");
-        $mise_stage->getCellByColumnAndRow(12,1)->setValue("Spécialité/Option");
-        $mise_stage->getCellByColumnAndRow(13,1)->setValue("Pays du stage");
-        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Ville du stage");
-        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ecole du stage");
+        $mise_stage->getCellByColumnAndRow(9,1)->setValue("Année Code");
+        $mise_stage->getCellByColumnAndRow(10,1)->setValue("Année du stage");
+        $mise_stage->getCellByColumnAndRow(11,1)->setValue("Niveau");
+        $mise_stage->getCellByColumnAndRow(12,1)->setValue("Filière");
+        $mise_stage->getCellByColumnAndRow(13,1)->setValue("Spécialité/Option");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Pays Code");
+        $mise_stage->getCellByColumnAndRow(14,1)->setValue("Pays du stage");
+        $mise_stage->getCellByColumnAndRow(15,1)->setValue("Ville Code");
+        $mise_stage->getCellByColumnAndRow(16,1)->setValue("Ville du stage");
+        $mise_stage->getCellByColumnAndRow(17,1)->setValue("Ecole du stage");
 
        
-
+        $datasetname = "mise_en_stages";
         $spreadsheet->setActiveSheetIndex(0);
 
         $writer = new Xlsx($spreadsheet);

@@ -172,6 +172,7 @@ class AgentFormationController extends Controller
     } 
 
 
+    
 
     public function export(Request $request)
     {
@@ -215,21 +216,262 @@ class AgentFormationController extends Controller
     }
 
 
+    public function buildAncienAgent(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Anciens agents');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Matricule");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
+        $datasetSheet->getCellByColumnAndRow(3,1)->setValue("Diplôme de base");
+        $datasetSheet->getCellByColumnAndRow(4,1)->setValue("Sexe");
+        $datasetSheet->getCellByColumnAndRow(5,1)->setValue("Status");
+        $datasetSheet->getCellByColumnAndRow(6,1)->setValue("Catégorie");
+        $datasetSheet->getCellByColumnAndRow(7,1)->setValue("Corps de la fonction publique");
+        $datasetSheet->getCellByColumnAndRow(8,1)->setValue("Structure");
+        $datasetSheet->getCellByColumnAndRow(9,1)->setValue("Plan de formation");
+
+        $agents = AgentFormation::all();
+        $i = 2;
+        foreach($agents as $agent)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($agent->matricule);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($agent->nom_prenoms);
+            $datasetSheet->getCellByColumnAndRow(3,$i)->setValue($agent->diplome_base);
+            $datasetSheet->getCellByColumnAndRow(4,$i)->setValue($agent->sexe);
+            $datasetSheet->getCellByColumnAndRow(5,$i)->setValue($agent->status);
+            $datasetSheet->getCellByColumnAndRow(6,$i)->setValue($agent->categorie);
+            $datasetSheet->getCellByColumnAndRow(7,$i)->setValue($agent->corps);
+            $datasetSheet->getCellByColumnAndRow(8,$i)->setValue($agent->structure);
+            $datasetSheet->getCellByColumnAndRow(9,$i)->setValue($agent->plan_formation);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+
+    public function buildStructure(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Structures');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Structures");
+
+        $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
+        $structures = Level::where('id_type',$id_structure->id)->get();
+        $i = 2;
+        foreach($structures as $structure)
+        {
+            if($structure->wording == "null" ) continue;
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($structure->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($structure->wording);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+
+    public function buildCategorie(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Categories');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Categories");
+
+        $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
+        $categories = Level::where('id_type',$id_cat->id)->get();
+        $i = 2;
+        foreach($categories as $categorie)
+        {
+            if($categorie->wording == "null" ) continue;
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($categorie->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($categorie->wording);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+    public function buildCorps(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Corps de la fonction publique');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Corps");
+
+        $id_corps = DB::table('type')->select('id')->where('wording','Corps de la fonction publique')->first();
+        $corps = Level::where('id_type',$id_corps->id)->get();
+        $i = 2;
+        foreach($corps as $cor)
+        {
+            if($cor->wording == "null" ) continue;
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($cor->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($cor->wording);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+    public function buildStatuts(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Statuts');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Statuts");
+
+        $id_status =  DB::table('type')->select('id')->where('wording','Statut')->first();
+        $statuts = Level::where('id_type',$id_status->id)->get();
+        $i = 2;
+        foreach($statuts as $statut)
+        {
+            if($statut->wording == "null" ) continue;
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($statut->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($statut->wording);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+    public function buildCountry(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Pays');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Pays");
+
+        $countries =  DB::table('countries')->get();
+        $i = 2;
+        foreach($countries as $country)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($country->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($country->name);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+    public function buildCity(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Villes');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Ville");
+
+        $cities =  DB::table('cities')->get();
+        $i = 2;
+        foreach($cities as $citie)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($citie->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($citie->name);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+    public function buildSexe(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Sexe');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Sexe");
+
+        $id_sexe =  DB::table('type')->select('id')->where('wording','Sexe')->first();
+        $sexes = Level::where('id_type',$id_sexe->id)->get();
+        $i = 2;
+        foreach($sexes as $sexe)
+        {
+            if($sexe->wording == "null" ) continue;
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($sexe->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($sexe->wording);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
+
+    public function buildAnnee(Spreadsheet $spreadsheet)
+    {
+        $datasetSheet = new Worksheet($spreadsheet,'Années');
+        $spreadsheet->addSheet($datasetSheet, 0);
+        
+        $datasetSheet = $spreadsheet->getSheet(0);
+        $datasetSheet->getCellByColumnAndRow(1,1)->setValue("Code");
+        $datasetSheet->getCellByColumnAndRow(2,1)->setValue("Année");
+
+        
+        $annees = DB::table('annee')->get();
+        $i = 2;
+        foreach($annees as $annee)
+        {
+            $datasetSheet->getCellByColumnAndRow(1,$i)->setValue($annee->id);
+            $datasetSheet->getCellByColumnAndRow(2,$i)->setValue($annee->value);
+            $i++;
+        }
+
+        
+        return $spreadsheet;
+    }
+
     public function genererExp(Request $request)
     {
+
+
         $spreadsheet = new Spreadsheet();
+        $spreadsheet = $this->buildAncienAgent($spreadsheet);
+        $spreadsheet = $this->buildCategorie($spreadsheet);
+        $spreadsheet = $this->buildStructure($spreadsheet);
+        $spreadsheet = $this->buildCorps($spreadsheet);
+        $spreadsheet = $this->buildSexe($spreadsheet);
+        $spreadsheet = $this->buildStatuts($spreadsheet);
+        
         $agentsheet = $spreadsheet->getActiveSheet();
-        $datasetname = "agents";
+        $agentsheet->setTitle('Nouvel Agent');
         $agentsheet->getCellByColumnAndRow(1,1)->setValue("Matricule");
         $agentsheet->getCellByColumnAndRow(2,1)->setValue("Nom & Prenoms");
         $agentsheet->getCellByColumnAndRow(3,1)->setValue("Diplôme de base");
-        $agentsheet->getCellByColumnAndRow(4,1)->setValue("Sexe");
-        $agentsheet->getCellByColumnAndRow(5,1)->setValue("Status");
-        $agentsheet->getCellByColumnAndRow(6,1)->setValue("Catégorie");
-        $agentsheet->getCellByColumnAndRow(7,1)->setValue("Corps de la fonction publique");
-        $agentsheet->getCellByColumnAndRow(8,1)->setValue("Structure");
-        $agentsheet->getCellByColumnAndRow(9,1)->setValue("Plan de Formation");
+        $agentsheet->getCellByColumnAndRow(4,1)->setValue("SexeCode");
+        $agentsheet->getCellByColumnAndRow(5,1)->setValue("Sexe");
+        $agentsheet->getCellByColumnAndRow(6,1)->setValue("StatusCode");
+        $agentsheet->getCellByColumnAndRow(7,1)->setValue("Status");
+        $agentsheet->getCellByColumnAndRow(8,1)->setValue("CatégorieCode");
+        $agentsheet->getCellByColumnAndRow(9,1)->setValue("Catégorie");
+        $agentsheet->getCellByColumnAndRow(10,1)->setValue("CorpsCode");
+        $agentsheet->getCellByColumnAndRow(11,1)->setValue("Corps de la fonction publique");
+        $agentsheet->getCellByColumnAndRow(12,1)->setValue("StructureCode");
+        $agentsheet->getCellByColumnAndRow(13,1)->setValue("Structure");
+        $agentsheet->getCellByColumnAndRow(14,1)->setValue("Plan de Formation");
 
+        $datasetname = "agents_formation";
        
         $spreadsheet->setActiveSheetIndex(0);
 
@@ -269,7 +511,8 @@ class AgentFormationController extends Controller
             
             $spreadsheet = IOFactory::load($file);
 
-            $agentsheet = $spreadsheet->getSheet(0);
+            $numberOfSheet = $spreadsheet->getSheetCount();
+            $agentsheet = $spreadsheet->getSheet(($numberOfSheet-1));
 
             $numberOfRow = $agentsheet->getHighestRow();
             
@@ -282,13 +525,13 @@ class AgentFormationController extends Controller
             {
                 $currentMatricule = $agentsheet->getCellByColumnAndRow(1,$i)->getValue();
                 $currentName = $agentsheet->getCellByColumnAndRow(2,$i)->getValue();
-                $currentSexe = $agentsheet->getCellByColumnAndRow(4,$i)->getValue();
                 $currentDiplome = $agentsheet->getCellByColumnAndRow(3,$i)->getValue();
-                $status =  $agentsheet->getCellByColumnAndRow(5,$i)->getValue();
-                $cate = $agentsheet->getCellByColumnAndRow(6,$i)->getValue();
-                $corps = $agentsheet->getCellByColumnAndRow(7,$i)->getValue();
-                $structure = $agentsheet->getCellByColumnAndRow(8,$i)->getValue();
-                $plan = $agentsheet->getCellByColumnAndRow(9,$i)->getValue();
+                $sexeCode = $agentsheet->getCellByColumnAndRow(4,$i)->getValue();
+                $statusCode =  $agentsheet->getCellByColumnAndRow(6,$i)->getValue();
+                $cateCode = $agentsheet->getCellByColumnAndRow(8,$i)->getValue();
+                $corpsCode = $agentsheet->getCellByColumnAndRow(10,$i)->getValue();
+                $structureCode = $agentsheet->getCellByColumnAndRow(12,$i)->getValue();
+                $plan = $agentsheet->getCellByColumnAndRow(14,$i)->getValue();
                 
                 if($plan instanceof RichText)
                 {
@@ -301,67 +544,63 @@ class AgentFormationController extends Controller
                 
                 
                 /* Statut */ 
-                if($status instanceof RichText)
+                if($statusCode instanceof RichText)
                 {
-                    $status = $status->getPlainText();
+                    $statusCode = $statusCode->getPlainText();
                 }
                 else
                 {
-                    $status = (string)$status;
+                    $statusCode = (string)$statusCode;
                 }
                 //Formating
-                $id_status =  DB::table('type')->select('id')->where('wording','Statut')->first();
-                $isStatus = Level::where('id_type',$id_status->id)->where('wording',$status)->first();
-                if($isStatus == null){
+                $status = Level::where('id',$statusCode)->first();
+                if($status == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
-                if($cate instanceof RichText)
+                if($cateCode instanceof RichText)
                 {
-                    $cate = $cate->getPlainText();
+                    $cateCode = $cateCode->getPlainText();
                 }
                 else
                 {
-                    $cate = (string)$cate;
+                    $cateCode = (string)$cateCode;
                 }
                 //Formating
-                $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
-                $isCat = Level::where('id_type',$id_cat->id)->where('wording',$cate)->first();
-                if($isCat == null){
+                $cat = Level::where('id',$cateCode)->first();
+                if($cat == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
                 
                 
 
-                if($corps instanceof RichText)
+                if($corpsCode instanceof RichText)
                 {
-                    $corps = $corps->getPlainText();
+                    $corpsCode = $corpsCode->getPlainText();
                 }
                 else
                 {
-                    $corps = (string)$corps;
+                    $corpsCode = (string)$corpsCode;
                 }
                 // Formating
-                $id_corps = DB::table('type')->select('id')->where('wording','Corps de la fonction publique')->first();
-                $isCorps = Level::where('id_type',$id_corps->id)->where('wording',$corps)->first();
-                if($isCorps == null){
+                $corps = Level::where('id',$corpsCode)->first();
+                if($corps == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
 
-                if($structure instanceof RichText)
+                if($structureCode instanceof RichText)
                 {
-                    $structure = $structure->getPlainText();
+                    $structureCode = $structureCode->getPlainText();
                 }
                 else
                 {
-                    $structure = (string)$structure;
+                    $structureCode = (string)$structureCode;
                 }
                 // Formating
-                $id_structure =  DB::table('type')->select('id')->where('wording','Structure')->first();
-                $isStruct = Level::where('id_type',$id_structure->id)->where('wording',$structure)->first();
-                if($isStruct == null){
+                $struct = Level::where('id',$structureCode)->first();
+                if($struct == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
 
@@ -375,19 +614,9 @@ class AgentFormationController extends Controller
                 }
 
 
-                if($currentSexe instanceof RichText)
-                {
-                    $currentSexe = $currentSexe->getPlainText();
-                }
-                else
-                {
-                    $currentSexe = (string)$currentSexe;
-                }
-
-                //Formating
-                $id_sexe =  DB::table('type')->select('id')->where('wording','Sexe')->first();    
-                $isSexe = Level::where('id_type',$id_sexe->id)->where('wording',$currentSexe)->first();
-                if($isSexe == null){
+                //Formating   
+                $sexe = Level::where('id',$sexeCode)->first();
+                if($sexe == null){
                     return redirect()->back()->with('nomenclatureError','error');
                 }
                 
@@ -422,13 +651,13 @@ class AgentFormationController extends Controller
                 {   
                     $agent = new AgentFormation;
                     $agent->matricule = $currentMatricule;
-                    $agent->sexe = $currentSexe;
+                    $agent->sexe = $sexe->wording;
                     $agent->nom_prenoms = $currentName;
                     $agent->diplome_base = $currentDiplome;
-                    $agent->categorie = $cate;
-                    $agent->status = $status;
-                    $agent->corps = $corps;
-                    $agent->structure = $structure;
+                    $agent->categorie = $cat->wording;
+                    $agent->status = $status->wording;
+                    $agent->corps = $corps->wording;
+                    $agent->structure = $struct->wording;
                     $agent->plan_formation = $plan;
                     if($agent->save())
                     {
@@ -512,7 +741,4 @@ class AgentFormationController extends Controller
         
         return $spreadsheet;
     }
-
-
-
 }

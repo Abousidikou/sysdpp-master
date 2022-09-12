@@ -930,12 +930,11 @@ class InfosController extends Controller
                 $linkedLevels = Indicators::find($indicator)->levels()->get();
                 $rlinkedLevels = [];
 
-
                 foreach($linkedLevels as $level)
                 {
                     $rlinkedLevels[] = $level->id;
                 }
-
+                
                 for($j = 1; $j <= $highestColumnIndex; $j++)
                 {
                     $col = $col + 2;
@@ -943,6 +942,7 @@ class InfosController extends Controller
                     if($col < $unitPos)
                     {
                         $levelId = $datasheet->getCellByColumnAndRow(($col),$i)->getValue();
+                        
                         if($levelId instanceof RichText)
                         {
                             $levelId = (int)$levelId->getPlainText();
@@ -961,6 +961,7 @@ class InfosController extends Controller
                         {
                             $levelsArray[] = $levelId;
                         }
+                        
                     }
                     
                     if($j > $unitPos)
@@ -977,14 +978,15 @@ class InfosController extends Controller
 
                         $year = (int)$datasheet->getCellByColumnAndRow(($j),1)->getValue();
 
-                        if($value !== null && $year !== null)
+                        if($value !== null && $value !== '0' && $year !== null)
                         {
                             $valueArray[] = $value;
                             $yearArray[] = $year;
                         }
                     }
-                }
 
+                }
+                
                 if($levelsArray == null || (count($levelsArray))==0)
                 {
                     if($lineHasError)

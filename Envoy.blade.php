@@ -90,7 +90,8 @@ composer clearcache;
 
 @task('currentRelease')
     rm -f {{ $currentRelease }};
-    chmod -R 777 {{ $release }};
+    chmod -R 777 {{ $release }}/public;
+    chmod -R 777 {{ $release }}/storage;
     ln -s -f {{ $release }} {{ $currentRelease }};
     ls {{ $dir }}/releases | sort -r | tail -n +{{ $releaseNumber+1 }} | xargs -I{} -r rm -rf {{ $dir }}/releases/{};
     echo "Link {{ $currentRelease }} --> {{ $release }} created";

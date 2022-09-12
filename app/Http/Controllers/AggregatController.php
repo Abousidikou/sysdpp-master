@@ -27,7 +27,7 @@ class AggregatController extends Controller
     }
 
     public function index()
-    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    {                                                                                                                       
         $id_status =  DB::table('type')->select('id')->where('wording','Statut')->first();
         $statuts = Level::where('id_type',$id_status->id)->get();
         $id_cat =  DB::table('type')->select('id')->where('wording','Categorie')->first();
@@ -62,31 +62,52 @@ class AggregatController extends Controller
         }
 
         /*******************        recuperation des options de generation  ****************************/
-        //$levelstf = $request->all();
-
+        
+        $types = array();
+        
         $statuts = $request->statut_id;
         $id_status =  DB::table('type')->where('wording','Statut')->first();
-        if($statuts == null) $statuts = array(Level::where('id_type',$id_status->id)->where('wording','null')->first()->id);
+        if($statuts == null || (count($statuts) == 1 && $statuts[0] == "null") ) {
+            $statuts = array(Level::where('id_type',$id_status->id)->where('wording','null')->first()->id);
+        }else{
+            $types[] = $id_status->id;
+        }
         if ($statuts[0] == "null") array_shift($statuts);
 
         $structure = $request->structure_id;
         $id_structure =  DB::table('type')->where('wording','Structure')->first();
-        if($structure == null) $structure = array(Level::where('id_type',$id_structure->id)->where('wording',"null")->first()->id);
+        if($structure == null || (count($structure) == 1 && $structure[0] == "null")) {
+            $structure = array(Level::where('id_type',$id_structure->id)->where('wording',"null")->first()->id);
+        }else{
+            $types[] = $id_structure->id;
+        }
         if ($structure[0] == "null") array_shift($structure);
         
         $categorie = $request->categorie_id;
         $id_cat =  DB::table('type')->where('wording','Categorie')->first();
-        if($categorie == null) $categorie = array(Level::where('id_type',$id_cat->id)->where('wording',"null")->first()->id);
+        if($categorie == null || (count($categorie) == 1 && $categorie[0] == "null") ) {
+            $categorie = array(Level::where('id_type',$id_cat->id)->where('wording',"null")->first()->id);
+        }else{
+            $types[] = $id_cat->id;
+        }
         if ($categorie[0] == "null") array_shift($categorie);
 
         $corps = $request->corps_id;
         $id_corps = DB::table('type')->where('wording','Corps de la fonction publique')->first();
-        if($corps == null) $corps = array(Level::where('id_type',$id_corps->id)->where('wording',"null")->first()->id);
+        if($corps == null || (count($corps) == 1 && $corps[0] == "null")) {
+            $corps = array(Level::where('id_type',$id_corps->id)->where('wording',"null")->first()->id);
+        }else{
+            $types[] = $id_corps->id;
+        }
         if ($corps[0] == "null") array_shift($corps);
 
         $sexe = $request->sexe_id;
         $id_sexe =  DB::table('type')->where('wording','Sexe')->first();
-        if($sexe == null) $sexe = array(Level::where('id_type',$id_sexe->id)->where('wording',"null")->first()->id);
+        if($sexe == null || (count($sexe) == 1 && $sexe[0] == "null") ) {
+            $sexe = array(Level::where('id_type',$id_sexe->id)->where('wording',"null")->first()->id);
+        }else{
+            $types[] = $id_sexe->id;
+        }
         if ($sexe[0] == "null") array_shift($sexe);
 
         $indic = $request->indicators;
@@ -96,8 +117,7 @@ class AggregatController extends Controller
        
         /*************************       preparation des parametres a envoyer aux fonction builts   ************************* */
         $indicatorsArray = array($indic);
-        $types = array($id_sexe->id,$id_corps->id,$id_structure->id,$id_cat->id,$id_status->id);
-        
+        //$types = array($id_sexe->id,$id_corps->id,$id_structure->id,$id_cat->id,$id_status->id);
         // Preparation du fichier excell
         $infoController = new InfosController();
         $spreadsheet = new Spreadsheet();
@@ -213,6 +233,7 @@ class AggregatController extends Controller
         
     }
 
+    
 
     public function genererAggregat(Request $request){
         $indics = $request->indicator;

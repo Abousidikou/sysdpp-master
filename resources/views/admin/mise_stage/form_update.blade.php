@@ -92,7 +92,19 @@
                                 <div class="help-info"></div>
                             </div>
 
-                            
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    @if ($mise_stage->isBoursier == 1)
+                                        <input class="form-check-input" type="checkbox" name="isBoursier" id="flexCheckChecked" checked>
+                                    @else
+                                        <input class="form-check-input" type="checkbox" name="isBoursier" id="flexCheckChecked">
+                                    @endif
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Checked checkbox
+                                    </label>
+                                </div>
+                                <div class="help-info"></div>
+                            </div>
 
                             <div class="form-group form-float">
                                 <div class="form-line">

@@ -97,133 +97,13 @@
 
                             Des erreurs sont survenues lors du traitement du fichier<br>
 
-                            Les données des champs  ne respectent pas la nomenclatures requise. <br><br> <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Nomenclature</button><br><br>
+                            Les données des champs <strong>Matricule, Nom & prénoms, SexeCode, StatutCode, CatégorieCode, CorpsCode et StructuresCode</strong> ne sont pas corrects. <br>
                             
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
-                                Voir la Liste des structures
-                            </button> <br>
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <strong>Structures</strong><br>
-                                    <ul class="list-group">
-                                        @if (isset($structures))
-                                            @foreach($structures as $strut)
-                                            <li class="list-group-item">{{ $strut->wording }}</li>
-                                            @endforeach
-                                        @endif
-                                        </ul>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
-                            <br>
-
-                            Les champs doivent être dans le même ordre que dans la nomenclature. <em>Générer un exemplaire pour plus de précision.</em> <br>
-                            Veuillez les corriger puis réessayer.  <br>
-
-                            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-md">
-                                <div class="modal-content">
-                                    <div class="modal-body">
-                                        <div class="form-group form-float">
-                                            <strong>Nomenclature</strong><br><br>
-                                            <table class="table table-striped table-bordered table-condensed">
-                                                <thead>
-                                                    <th>Nom de la colonne</th>
-                                                    <th>Numero de la  colonne</th>
-                                                    <th>Exigences</th>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><strong>Matricule</strong></td>
-                                                        <td>1</td>
-                                                        <td>Doit être unique par agent</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Nom & prenom</strong></td>
-                                                        <td>2</td>
-                                                        <td>Obligatoire</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Numero de decision de RS</strong></td>
-                                                        <td>3</td>
-                                                        <td>Néant</td>
-                                                        
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Date signature de RS</strong></td>
-                                                        <td>4</td>
-                                                        <td>Néant</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Date de fin de formation</strong></td>
-                                                        <td>5</td>
-                                                        <td>Néant</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Date de fin de reprise de service</strong></td>
-                                                        <td>6</td>
-                                                        <td>Néant</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Catégorie</strong></td>
-                                                        <td>7</td>
-                                                        <td>Comprise entre [ 'A', 'B', 'C' , 'D' , 'E' , 'S' , 'Total_catégorie' , 'null' ]. Ces valeurs doivent être écrite telles.</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Année de Retour de stage</strong></td>
-                                                        <td>8</td>
-                                                        <td>Doit être une année valide</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Incidence BN</strong></td>
-                                                        <td>9</td>
-                                                        <td>Néant</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><strong>Structure de retour en Stage (RS)</strong></td>
-                                                        <td>10</td>
-                                                        <td>Les structures doivent respecter les mêmes syntaxes que celles enrégistrées. </td>
-                                                        
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer"><button type="button" class="btn  btn-secondary" data-dismiss="modal">Fermer</button>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-
-                            
-
+                            Les champs doivent être dans le même ordre que dans l'examplaire. <em>Générer un exemplaire pour plus de précision.</em> <br>
+                            Veuillez les corriger puis réessayer.
                         </div>
 
-                        @endif
+                    @endif
 
                     <form id="form_advanced_validation" method="POST"
                         action="{{ route('retourDeStage.import') }}" enctype="multipart/form-data">
