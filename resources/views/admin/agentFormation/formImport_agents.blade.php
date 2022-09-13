@@ -79,7 +79,7 @@
 
                             Des erreurs sont survenues lors du traitement du fichier<br>
 
-                            Toutes les donnees n'ont pu etre sauvegarde<br>
+                            IL se pourrai qu'il y ait deux agents du même matricule.<br>
 
                             Veuillez voir ci-joint le fichier contenant les lignes non enregistrees<br>
 

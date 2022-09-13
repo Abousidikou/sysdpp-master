@@ -968,7 +968,9 @@ class AgentFormationController extends Controller
                 }
 
                 if ($anotherMonth) {
-                    $row = $row + 5;
+                    
+                    if($i != 2) {
+                        $row = $row + 5;
                     $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Total");
                     $agentsheet->getCellByColumnAndRow(9,$row)->setValue($TotalDebit);
                     $agentsheet->getCellByColumnAndRow(9,$row)->setValue($TotalDebit);
@@ -993,7 +995,9 @@ class AgentFormationController extends Controller
                     $ecart_base_calcule = $base_calcule - $TotalDebit;
                     $agentsheet->getCellByColumnAndRow(9,$row)->setValue($ecart_base_calcule);
                     $TotalCredit = $TotalDebit = 0;
-                    if($i != 2) $row = $row + 10;
+                        $row = $row + 10;
+                    
+                    }
                     if($anotherYear == true) {
                         $anotherYear = FALSE;
                         $row = 1;
