@@ -12,6 +12,7 @@ use App\Models\Level;
 use App\Models\MiseEnStage;
 use App\Models\Indicators;
 use App\Models\RetourDeStage;
+use phpDocumentor\Reflection\PseudoTypes\False_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -522,10 +523,15 @@ class AgentFormationController extends Controller
                 $currentName = $agentsheet->getCellByColumnAndRow(2,$i)->getValue();
                 $currentDiplome = $agentsheet->getCellByColumnAndRow(3,$i)->getValue();
                 $sexeCode = $agentsheet->getCellByColumnAndRow(4,$i)->getValue();
+                if(!is_int($sexeCode)) $sexeCode =  $agentsheet->getCellByColumnAndRow(4,$i)->getCalculatedValue();
                 $statusCode =  $agentsheet->getCellByColumnAndRow(6,$i)->getValue();
+                if(!is_int($statusCode)) $statusCode =  $agentsheet->getCellByColumnAndRow(6,$i)->getCalculatedValue();
                 $cateCode = $agentsheet->getCellByColumnAndRow(8,$i)->getValue();
+                if(!is_int($cateCode)) $cateCode =  $agentsheet->getCellByColumnAndRow(8,$i)->getCalculatedValue();
                 $corpsCode = $agentsheet->getCellByColumnAndRow(10,$i)->getValue();
+                if(!is_int($corpsCode)) $corpsCode =  $agentsheet->getCellByColumnAndRow(10,$i)->getCalculatedValue();
                 $structureCode = $agentsheet->getCellByColumnAndRow(12,$i)->getValue();
+                if(!is_int($structureCode)) $structureCode =  $agentsheet->getCellByColumnAndRow(12,$i)->getCalculatedValue();
                 $plan = $agentsheet->getCellByColumnAndRow(14,$i)->getValue();
                 
                 if($plan instanceof RichText)
@@ -542,6 +548,7 @@ class AgentFormationController extends Controller
                 if ($statusCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
+                //dd($statusCode,$sexeCode,$cateCode,$corpsCode,$structureCode);
                 if($statusCode instanceof RichText)
                 {
                     $statusCode = $statusCode->getPlainText();
@@ -551,6 +558,9 @@ class AgentFormationController extends Controller
                     $statusCode = (string)$statusCode;
                 }
                 $status = Level::where('id',$statusCode)->first();
+                if($status == null){
+                    return redirect()->back()->with('nomenclatureError','error');
+                }
 
                 /* Categorie */ 
 
@@ -743,4 +753,325 @@ class AgentFormationController extends Controller
         
         return $spreadsheet;
     }
+
+
+
+
+    public function sirFunction(Request $request)
+    {
+        $rules = array('importfile' => 'mimes:xlsx,xls');
+ 
+        $file = $request->file('importfile');//->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
+        $allowed = ['xlsx','xls'];
+        //dd($file->getClientOriginalExtension());
+        $validator = Validator::make($request->all(), $rules);
+        $linesWithError = [];
+        if(!in_array($extension,$allowed))
+        {
+            return redirect()->back()->with('validation','error');
+        }
+        else
+        {
+            
+            $spreadsheet = IOFactory::load($file);
+
+            $numberOfSheet = $spreadsheet->getSheetCount();
+            $brut = $spreadsheet->getSheet(0);
+
+            $numberOfRow = $brut->getHighestRow();
+            //dd($brut);
+            // $highestColumn = $domainsheet->getHighestColumn(); // e.g 'F'
+            // $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // e.g. 5
+
+
+            //dd($numberOfRow);
+            $date_op = "";
+            $date_val = "";
+            $sir_libelle = "";
+            $credit = "";
+            $debit = "";
+            $solde = "";
+            $spread = new Spreadsheet();
+            $agentsheet = $spread->getActiveSheet();
+            $agents = AgentFormation::all();
+            $datasetname = "Compte";
+            $agentsheet->setTitle('2013');
+            $col = 1;
+            $row = 1;
+            $currentMonth = 1;
+            $currentYear = 2013;
+            $currentDay = 1;
+            $writeSolde = FALSE;
+            $debitarray = [];
+            $creditarray = [];
+            $soldePrecedent =  0;
+            $anotherDay = False;
+            $anotherMonth = TRUE;
+            $anotherYear = FALSE;
+            $CalculSolde = FALSE;
+            $TotalDebit = 0;
+            $TotalCredit = 0;
+            $interet = 0;
+            $montant_interet = 0;
+            $cst = 0.08;
+            $ecart = 0;
+            $base_calcule = 0;
+            $ecart_base_calcule = 0;
+            for($i = 2; $i <= $numberOfRow; $i++)
+            {
+                $date_op = $brut->getCellByColumnAndRow(1,$i)->getValue();
+                $sir_libelle = $brut->getCellByColumnAndRow(2,$i)->getValue();
+                $date_val = $brut->getCellByColumnAndRow(3,$i)->getValue();
+                $debit = $brut->getCellByColumnAndRow(4,$i)->getValue();
+                $credit =  $brut->getCellByColumnAndRow(5,$i)->getValue();
+                $solde = $brut->getCellByColumnAndRow(6,$i)->getCalculatedValue();
+                $next_date = $brut->getCellByColumnAndRow(3,$i+1)->getValue();
+                if($date_op instanceof RichText)
+                {
+                    $date_op = $date_op->getPlainText();
+                }
+                else
+                {
+                    $date_op = (string)$date_op;
+                }
+                
+                if ($date_op != null && $date_op != "") {
+                    //$date_op = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_op);
+                }
+                
+                //dd($date_op)
+                
+                
+                /* Statut */ 
+                if($sir_libelle instanceof RichText)
+                {
+                    $sir_libelle = $sir_libelle->getPlainText();
+                }
+                else
+                {
+                    $sir_libelle = (string)$sir_libelle;
+                }
+
+                if($date_val instanceof RichText)
+                {
+                    $date_val = $date_val->getPlainText();
+                }
+                else
+                {
+                    $date_val = (string)$date_val;
+                }
+
+                $date_val = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_val);
+
+                // Next day retrieval
+                if($next_date instanceof RichText)
+                {
+                    $next_date = $next_date->getPlainText();
+                }
+                else
+                {
+                    $next_date = (string)$next_date;
+                }
+
+                if($next_date != null) $next_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($next_date);
+
+
+
+                if($debit instanceof RichText)
+                {
+                    $debit = $debit->getPlainText();
+                }
+                else
+                {
+                    $debit = (int)$debit;
+                }
+                $debitarray[] = $debit;
+
+                if($credit instanceof RichText)
+                {
+                    $credit = $credit->getPlainText();
+                }
+                else
+                {
+                    $credit = (int)$credit;
+                }
+                $creditarray[] = $credit;
+
+                if($solde instanceof RichText)
+                {
+                    $solde = $solde->getPlainText();
+                }
+                else
+                {
+                    $solde = (int)$solde;
+                }
+
+                if($currentYear != (int)$date_val->format('Y')){
+                    $anotherYear = TRUE;
+                    $anotherMonth = TRUE;
+                    $anotherDay = TRUE;
+                    $CalculSolde = FALSE;
+                }else{
+                    if($currentMonth !=  (int)$date_val->format('m')){
+                        $CalculSolde = TRUE;
+                        $anotherMonth = TRUE;
+                        $anotherDay = TRUE;
+                    }else{
+                        if( $currentDay != (int)$date_val->format('d')){
+                            $anotherDay = TRUE;
+                            $CalculSolde = TRUE;
+                        }else{
+                            $anotherDay = FALSE;
+                        }
+                    }
+                }
+                
+                
+
+                if ($anotherYear) {
+                    $datasetSheet = new Worksheet($spread,$date_val->format('Y'));
+                    $spread->addSheet($datasetSheet, 0);
+                    $agentsheet = $spread->getSheet(0);
+                    $currentYear = (int)$date_val->format('Y');
+                }
+
+                $sDebit = 0;
+                $sCredit = 0 ;
+                if($anotherDay && $CalculSolde){
+                    foreach ($debitarray as $key => $value) {
+                        if($key == count($debitarray) - 1) break;
+                        $sDebit += $value;
+                    }
+                    foreach ($creditarray as $key => $value) {
+                        if($key == count($creditarray) - 1) break;
+                        $sCredit += $value;
+                    }
+                    $debitarray = array($debitarray[count($debitarray)-1]);
+                    $creditarray = array($creditarray[count($creditarray)-1]);
+
+                    $soldePrecedent = $soldePrecedent + $sCredit - $sDebit;
+                    $isDebit = ($soldePrecedent < 0) ? TRUE : FALSE;
+                    ++$row;
+                    if ($isDebit) {
+                        $col = 4;
+                        $agentsheet->getCellByColumnAndRow($col,$row)->setValue(-1 * $soldePrecedent);
+                        $col = 6;
+                        $agentsheet->getCellByColumnAndRow($col,$row)->setValue(-1 * $soldePrecedent);
+                    }else{
+                        $col = 5;
+                        $agentsheet->getCellByColumnAndRow($col,$row)->setValue($soldePrecedent);
+                        $col = 7;
+                        $agentsheet->getCellByColumnAndRow($col,$row)->setValue($soldePrecedent);
+                    }
+                    $anotherDay = FALSE;
+                }
+
+                if ($anotherMonth) {
+                    $row = $row + 5;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Total");
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($TotalDebit);
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($TotalDebit);
+                    $row = $row + 2;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Intérêts débiteurs");
+                    $interet = ($TotalDebit * $cst)/360;
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($interet);
+                    $row = $row + 2;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Montant des intérêt débiteurs calculés par la banque");
+                    $montant_interet = 3338340;
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($montant_interet);
+                    $row = $row + 2;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Ecart");
+                    $ecart = $interet - $montant_interet;
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($ecart);
+                    $row = $row + 2;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Base de calcul Considérant le montant des Int débiteurs banque");
+                    $base_calcule = (360*$montant_interet)/$cst;
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($base_calcule);
+                    $row = $row + 2;
+                    $agentsheet->getCellByColumnAndRow(2,$row)->setValue("Ecart avec la base de calcul");
+                    $ecart_base_calcule = $base_calcule - $TotalDebit;
+                    $agentsheet->getCellByColumnAndRow(9,$row)->setValue($ecart_base_calcule);
+                    $TotalCredit = $TotalDebit = 0;
+                    if($i != 2) $row = $row + 10;
+                    if($anotherYear == true) {
+                        $anotherYear = FALSE;
+                        $row = 1;
+                    }
+                    $col = 1;
+                    
+                    $agentsheet->mergeCellsByColumnAndRow($col,$row,++$col,$row,++$col,$row,++$col,$row,++$col,$row,++$col,$row); 
+                    $agentsheet->getCellByColumnAndRow($col-5,$row)->setValue($date_val->format('M'))->getStyle()->getFont()->setBold(true);
+                    ++$row;
+                    $col = 1;
+                    $agentsheet->getCellByColumnAndRow($col,$row)->setValue("Date Op")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Libellé")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Date Val")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->mergeCellsByColumnAndRow(++$col,$row,$col++,$row); 
+                    $agentsheet->getCellByColumnAndRow($col-1,$row)->setValue("Capitaux")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->mergeCellsByColumnAndRow(++$col,$row,++$col,$row); 
+                    $agentsheet->getCellByColumnAndRow($col-1,$row)->setValue("Solde")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("NBj")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->mergeCellsByColumnAndRow(++$col,$row,++$col,$row); 
+                    $agentsheet->getCellByColumnAndRow($col-1,$row)->setValue("Nombre")->getStyle()->getFont()->setBold(true);
+                    ++$row;
+                    $col = 4;
+                    $agentsheet->getCellByColumnAndRow($col,$row)->setValue("Debit")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Credit")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Debit")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Credit")->getStyle()->getFont()->setBold(true);
+                    $col = $col + 2;
+                    $agentsheet->getCellByColumnAndRow($col,$row)->setValue("Debit")->getStyle()->getFont()->setBold(true);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue("Credit")->getStyle()->getFont()->setBold(true);
+
+                    $currentMonth = (int)$date_val->format('m');
+                    $anotherMonth = FALSE;
+                }
+                
+
+                ++$row;             
+                $col = 1;
+                $agentsheet->getCellByColumnAndRow($col,$row)->setValue($date_op);//$date_op->format('d/m/Y')
+                $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue($sir_libelle);
+                $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue($date_val->format('d/m/Y'));
+                $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue(($debit != 0)? $debit : "");
+                $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue(($credit != 0)? $credit : "");
+                $col = $col + 2;
+                
+                if($next_date != null) {
+                    $diff_Date = $next_date->diff($date_val)->format("%a");
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue($diff_Date);
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue((($debit*$diff_Date)!=0)?($debit*$diff_Date) : "");
+                    $agentsheet->getCellByColumnAndRow(++$col,$row)->setValue((($credit*$diff_Date)!=0)?($credit*$diff_Date) : "");
+                    $TotalDebit += $debit*$diff_Date;
+                    $TotalCredit += $credit*$diff_Date;
+                }
+
+
+                $currentDay = (int)$date_val->format('d');
+                
+                
+                //if($i == 20) break;
+                if($i == $numberOfRow ){
+                    
+
+                }
+
+            }
+
+
+
+        $spread->setActiveSheetIndex(0);
+
+        $writer = new Xlsx($spread);
+        $path = public_path();
+        $path = $path."/template/$datasetname.xlsx";
+        $writer->save($path);
+
+        return redirect()->back()->with("path","template/$datasetname.xlsx");
+
+        }
+    }
+
+    
 }
