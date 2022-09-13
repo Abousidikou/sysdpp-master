@@ -156,7 +156,7 @@ Route::prefix('agentFormation')->group(function(){
     Route::get('export','AgentFormation\AgentFormationController@export')->name('agentFormation.exporter');
 
     Route::get('formimport','AgentFormation\AgentFormationController@formimport')->name('agentFormation.formimport');
-    Route::post('import','AgentFormation\AgentFormationController@import')->name('importagentFormation.import');
+    Route::post('import','AgentFormation\AgentFormationController@import')->name('agentFormation.import');
 
     Route::get('genererExp','AgentFormation\AgentFormationController@genererExp')->name('agentFormation.genererExp');
 
