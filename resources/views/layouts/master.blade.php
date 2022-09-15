@@ -255,11 +255,6 @@
                             </p>
                         </a>
 
-                        <a href="#" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES AGENTS EN FORMATION
-                            </p>
-                        </a>
                     @elseif(Auth::user()->role=="agents_m")
                         <a href="{{route('agentFormation.data')}}" class="list-group-item">
                             <p class="list-group-item-text">

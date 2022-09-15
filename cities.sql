@@ -6,6 +6,9 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+SET foreign_key_checks = 0;
+DROP TABLE IF EXISTS `cities`;
+SET foreign_key_checks = 1;
 CREATE TABLE IF NOT EXISTS `cities` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
@@ -47980,7 +47983,8 @@ INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES
 (48353,'Vijes',805),
 (48354,'Yotoco',805),
 (48355,'Yumbo',805),
-(48356,'Zarzal',805);
+(48356,'Zarzal',805),
+(48357,'Sékou',447);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
