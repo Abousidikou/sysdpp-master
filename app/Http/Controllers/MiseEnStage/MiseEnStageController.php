@@ -220,7 +220,7 @@ class MiseEnStageController extends Controller
             for($i = 2; $i <= $numberOfRow; $i++)
             {
 
-                if($i < 20 )continue;
+                if($i < 30 )continue;
 
                 $currentMatricule = $mise_stage->getCellByColumnAndRow(1,$i)->getValue();
                 $date_signature = $mise_stage->getCellByColumnAndRow(3,$i)->getValue();
