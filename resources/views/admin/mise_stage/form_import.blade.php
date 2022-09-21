@@ -96,7 +96,7 @@
 
                             Des erreurs sont survenues lors du traitement du fichier<br>
 
-                            Les données des champs <strong>Matricule, Nom & prénoms, SexeCode, StatutCode, CatégorieCode, CorpsCode et StructuresCode</strong> ne sont pas corrects. <br>
+                            Les données des champs <strong>Matricule, Nom & prénoms, CityCode</strong> ne sont pas corrects. <br>
                             
                             Les champs doivent être dans le même ordre que dans l'examplaire. <em>Générer un exemplaire pour plus de précision.</em> <br>
                             Veuillez les corriger puis réessayer.
