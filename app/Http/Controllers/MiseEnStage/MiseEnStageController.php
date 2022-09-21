@@ -390,7 +390,7 @@ class MiseEnStageController extends Controller
                 }
                 else
                 {
-                    dd('mise');
+                    
                     $id_agent = AgentFormation::where('matricule',$currentMatricule)->first();
                     $mise_s = new MiseEnStage;
                     $mise_s->id_agent = $id_agent->id;
