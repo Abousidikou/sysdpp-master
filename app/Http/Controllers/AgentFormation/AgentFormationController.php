@@ -535,7 +535,7 @@ class AgentFormationController extends Controller
                 if(!is_int($structureCode)) $structureCode =  $agentsheet->getCellByColumnAndRow(12,$i)->getCalculatedValue();
                 $plan = $agentsheet->getCellByColumnAndRow(14,$i)->getValue();
                 
-                dd($statusCode,$cateCode,$corpsCode,$structureCode,$sexeCode);
+                //dd($statusCode,$cateCode,$corpsCode,$structureCode,$sexeCode);
                 if($plan instanceof RichText)
                 {
                     $plan = $plan->getPlainText();
@@ -550,7 +550,7 @@ class AgentFormationController extends Controller
                 if ($statusCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
-                dd($statusCode,$sexeCode,$cateCode,$corpsCode,$structureCode);
+                //dd($statusCode,$sexeCode,$cateCode,$corpsCode,$structureCode);
                 if($statusCode instanceof RichText)
                 {
                     $statusCode = $statusCode->getPlainText();

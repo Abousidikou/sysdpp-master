@@ -224,16 +224,19 @@ class MiseEnStageController extends Controller
                 $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
                 $numero_decision_ms = $mise_stage->getCellByColumnAndRow(5,$i)->getValue();
                 $isBoursier = $mise_stage->getCellByColumnAndRow(6,$i)->getValue();
+                if(!is_int($isBoursier)) $isBoursier =  $mise_stage->getCellByColumnAndRow(6,$i)->getCalculatedValue();
                 $nature_bourse = $mise_stage->getCellByColumnAndRow(7,$i)->getValue();
                 $duree = $mise_stage->getCellByColumnAndRow(8,$i)->getValue();
                 $anneeCode = $mise_stage->getCellByColumnAndRow(9,$i)->getValue();
+                if(!is_int($anneeCode)) $anneeCode =  $mise_stage->getCellByColumnAndRow(9,$i)->getCalculatedValue();
+                //if(!is_int($sexeCode)) $sexeCode =  $agentsheet->getCellByColumnAndRow(4,$i)->getCalculatedValue();
                 $niveau = $mise_stage->getCellByColumnAndRow(11,$i)->getValue();
                 $filiere = $mise_stage->getCellByColumnAndRow(12,$i)->getValue();
                 $spec_option = $mise_stage->getCellByColumnAndRow(13,$i)->getValue();
                 $cityCode = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
                 $ecole_stage = $mise_stage->getCellByColumnAndRow(17,$i)->getValue();
 
-                dd($cityCode,$isBoursier,$anneeCode);
+                
 
                 if ($isBoursier != null) {
                     if($isBoursier instanceof RichText)
@@ -262,18 +265,21 @@ class MiseEnStageController extends Controller
                     $spec_option = (string)$spec_option;
                 }
 
+                
                 if ($cityCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
+                
                 if($cityCode instanceof RichText)
                 {
                     $cityCode = $cityCode->getPlainText();
                 }
                 else
                 {
-                    $cityCode = (string)$cityCode;
+                    $cityCode = (int)$cityCode;
                 }
 
+                
                 // appel a model 
                 $city = City::where('id',$cityCode)->first();
                 if ($city == null) {
@@ -302,7 +308,6 @@ class MiseEnStageController extends Controller
                     $niveau = (string)$niveau;
                 }
 
-
                 if ($anneeCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
@@ -314,6 +319,7 @@ class MiseEnStageController extends Controller
                 {
                     $anneeCode = (string)$anneeCode;
                 }
+                //dd($anneeCode);
                 // appel a model 
                 $annee = DB::table('annee')->where('id',$anneeCode)->first();
                 if ($annee == null) {
@@ -357,6 +363,7 @@ class MiseEnStageController extends Controller
                 {
                     $date_demarrage_stage = (string)$date_demarrage_stage;
                 }
+                $date_demarrage_stage = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_demarrage_stage);
 
                 if($date_signature instanceof RichText)
                 {
@@ -366,8 +373,8 @@ class MiseEnStageController extends Controller
                 {
                     $date_signature = (string)$date_signature;
                 }
-
-
+                $date_signature = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_signature);
+                
                 if($currentMatricule instanceof RichText)
                 {
                     $currentMatricule = $currentMatricule->getPlainText();
@@ -378,6 +385,7 @@ class MiseEnStageController extends Controller
                 }
                 if(!$this->agentExist($currentMatricule))
                 {
+                   
                     $linesWithError[] = $i;
                 }
                 else
@@ -406,6 +414,7 @@ class MiseEnStageController extends Controller
                     }
                     else
                     {
+                        
                         $linesWithError[] = $i;
                     }
                 }

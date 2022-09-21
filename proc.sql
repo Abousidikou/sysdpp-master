@@ -548,8 +548,11 @@ INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '125', NULL, NULL);
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '122', NULL, NULL);
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '124', NULL, NULL);
-
-
+INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Abomey-Calavi', '447');
+INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Sékou', '447');
+INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Porto-Novo', '447');
+INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Abidjan', '850');
+INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Louvain', '424');
 
 
 
