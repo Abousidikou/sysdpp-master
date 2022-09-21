@@ -219,6 +219,9 @@ class MiseEnStageController extends Controller
 
             for($i = 2; $i <= $numberOfRow; $i++)
             {
+
+                if($i < 20 )continue;
+
                 $currentMatricule = $mise_stage->getCellByColumnAndRow(1,$i)->getValue();
                 $date_signature = $mise_stage->getCellByColumnAndRow(3,$i)->getValue();
                 $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
@@ -308,6 +311,7 @@ class MiseEnStageController extends Controller
                     $niveau = (string)$niveau;
                 }
 
+                
                 if ($anneeCode == null) {
                     return redirect()->back()->with('nomenclatureError','error');
                 }
@@ -353,7 +357,7 @@ class MiseEnStageController extends Controller
                     $numero_decision_ms = (string)$numero_decision_ms;
                 }
 
-             
+                
 
                 if($date_demarrage_stage instanceof RichText)
                 {
