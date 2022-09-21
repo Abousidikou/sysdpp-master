@@ -363,7 +363,7 @@ class MiseEnStageController extends Controller
                 {
                     $date_demarrage_stage = (string)$date_demarrage_stage;
                 }
-                $date_demarrage_stage = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_demarrage_stage);
+                //$date_demarrage_stage = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_demarrage_stage);
 
                 if($date_signature instanceof RichText)
                 {
@@ -373,7 +373,7 @@ class MiseEnStageController extends Controller
                 {
                     $date_signature = (string)$date_signature;
                 }
-                $date_signature = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_signature);
+                //$date_signature = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date_signature);
                 
                 if($currentMatricule instanceof RichText)
                 {
@@ -390,6 +390,7 @@ class MiseEnStageController extends Controller
                 }
                 else
                 {
+                    dd('mise');
                     $id_agent = AgentFormation::where('matricule',$currentMatricule)->first();
                     $mise_s = new MiseEnStage;
                     $mise_s->id_agent = $id_agent->id;

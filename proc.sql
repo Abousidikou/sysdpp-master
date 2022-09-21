@@ -553,6 +553,6 @@ INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Sékou', '447');
 INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Porto-Novo', '447');
 INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Abidjan', '850');
 INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Louvain', '424');
-
+ALTER TABLE `mise_en_stages`  ADD `isBoursier` BOOLEAN NOT NULL  AFTER `nature_bourse`;
 
 
