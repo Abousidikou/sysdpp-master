@@ -233,7 +233,7 @@ class MiseEnStageController extends Controller
                 $cityCode = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
                 $ecole_stage = $mise_stage->getCellByColumnAndRow(17,$i)->getValue();
 
-                //dd($country,$state,$city);
+                dd($cityCode,$isBoursier,$anneeCode);
 
                 if ($isBoursier != null) {
                     if($isBoursier instanceof RichText)
