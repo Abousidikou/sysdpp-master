@@ -128,9 +128,10 @@
 
                     @if(Auth::user()->role == "admin" || Auth::user()->role == "agents_m" )
                         <caption style="caption-side: top; text-align:center" title="Cliquer pour ajouter un nouvel agent">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Générer les agrrégats</button>    
                             <a href="{{route('agentFormation.form')}}" class="btn bg-green waves-effect">Ajouter des agents</a>
-                            <a href="{{ route('agentFormation.exporter') }}" class="btn bg-green waves-effect">Exporter</a>
                             <a href="{{route('agentFormation.formimport')}}" class="btn bg-green waves-effect">Importer un fichier</a>
+                            <a href="{{ route('agentFormation.exporter') }}" class="btn bg-green waves-effect">Exporter</a>
                             @if (session('path'))
                                 @php
                                     $path = session('path');
@@ -143,7 +144,7 @@
                 </table>
 
                 <!-- Small modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Générer les agrrégats</button>
+                    
 
                     <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-sm">

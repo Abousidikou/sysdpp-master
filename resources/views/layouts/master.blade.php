@@ -191,7 +191,7 @@
             <!-- Footer -->
             <div class="legal">
                 <div class="copyright">
-                    &copy; 2018 <a href="javascript:void(0);">MTFP - Informations Statistique</a>.
+                    &copy; 2018-2022 <a href="javascript:void(0);">MTFP - Informations Statistique</a>.
                 </div>
                 <div class="version">
                     <b>Version: </b> 1.0
@@ -255,6 +255,12 @@
                             </p>
                         </a>
 
+                        <a href="{{route('infos')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES INFORMATIONS STATISTIQUES
+                                </p>
+                        </a>
+
                     @elseif(Auth::user()->role=="agents_m")
                         <a href="{{route('agentFormation.data')}}" class="list-group-item">
                             <p class="list-group-item-text">
@@ -281,11 +287,7 @@
 
                     @endif                     
                         @if(Auth::user()->role != 'agents_m')
-                            <a href="{{route('infos')}}" class="list-group-item">
-                                <p class="list-group-item-text">
-                                    GESTION DES INFORMATIONS STATISTIQUES
-                                </p>
-                            </a>
+                            
                         @endif
                         <br><br><br>
                         <a href="{{ route('logout') }}"

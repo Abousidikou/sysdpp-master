@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
+
+
     /*
     |--------------------------------------------------------------------------
     | Register Controller
@@ -36,8 +38,9 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('auth');
     }
+
 
     /**
      * Get a validator for an incoming registration request.
@@ -47,11 +50,12 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        return redirect('dashboard');
+        return Validator::make($data, [/* 
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-        ]);
+         */]);
     }
 
     /**
@@ -62,10 +66,11 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        /* return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-        ]);
+        ]); */
+        return redirect('dashboard');
     } 
 }

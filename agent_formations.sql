@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 21, 2022 at 02:59 PM
+-- Generation Time: Sep 23, 2022 at 11:53 AM
 -- Server version: 8.0.30-0ubuntu0.20.04.2
 -- PHP Version: 7.4.3
 
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `agent_formations`
 --
-
+DROP TABLE IF EXISTS `agent_formations`;
 CREATE TABLE `agent_formations` (
   `id` int UNSIGNED NOT NULL,
   `matricule` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,

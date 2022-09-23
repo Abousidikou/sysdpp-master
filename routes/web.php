@@ -24,7 +24,11 @@ Route::get('/domains','Domain\DomainController@index')->name('domains');
 Route::get('/subdomains','SubDomain\SubDomainController@index')->name('subdomains');
 
 Route::get('/profile','ProfileController@index')->name('profile');
-Auth::routes();
+Auth::routes([
+    'register' => false, // Registration Routes...
+    'reset' => false, // Password Reset Routes...
+    'verify' => false, // Email Verification Routes...
+  ]);
 
 Route::get('/dashboard', 'HomeController@index')->name('home');
 Route::get('/dash/stat','HomeController@stat');
