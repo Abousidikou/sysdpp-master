@@ -10,6 +10,7 @@
 
     <h2>AGGREGATS</h2>
 
+    <h6 style="color: red ;">N'oubliez pas de générer les aggrégats avant de les exporter</h6>
     <small>Vous pouvez filtrer les données en appliquant les filtres de votre choix</small>
 
 </div>
@@ -61,7 +62,9 @@
                                     <select name="sexe_id[]" class="form-control show-tick" data-live-search="true" multiple>
                                         <option value="null" style="background:#919c9e; color: #fff;">Pas de selection</option>
                                         @foreach ($sexes as $sexe)
-                                        	<option value="{{ $sexe->id }}" style="background:#919c9e; color: #fff;">{{ $sexe->wording }}</option>
+                                            @if ($sexe->wording != "null")
+                                                <option value="{{ $sexe->id }}" style="background:#919c9e; color: #fff;">{{ $sexe->wording }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -71,7 +74,9 @@
                                     <select name="statut_id[]" class="form-control show-tick" data-live-search="true" multiple>
                                         <option value="null" style="background:#919c9e; color: #fff;">Pas de selection</option>
                                         @foreach ($statuts as $stat)
-                                        	<option value="{{ $stat->id }}" style="background:#919c9e; color: #fff;">{{ $stat->wording }}</option>
+                                            @if ($stat->wording != "null")
+                                        	    <option value="{{ $stat->id }}" style="background:#919c9e; color: #fff;">{{ $stat->wording }}</option>
+                                            @endif        
                                         @endforeach
                                     </select>
                                 </div>
@@ -82,19 +87,21 @@
                                     <select name="categorie_id[]" class="form-control show-tick" data-live-search="true" multiple>
                                         <option value="null" style="background:#919c9e; color: #fff;">Pas de selection</option>
                                         @foreach ($categories as $cat)
-                                        	<option value="{{ $cat->id }}" style="background:#919c9e; color: #fff;">{{ $cat->wording }}</option>
+                                           @if($cat->wording != "null")
+                                           <option value="{{ $cat->id }}" style="background:#919c9e; color: #fff;">{{ $cat->wording }}</option>
+                                           @endif
                                         @endforeach
                                     </select>
                                 </div>
                                 
-                                
-
                                 <div class="col-md-3">
                                     <label class="form-label"><small>Structure</small> </label><br>
                                     <select name="structure_id[]" class="form-control show-tick" data-live-search="true" multiple>
                                         <option value="null" style="background:#919c9e; color: #fff;">Pas de selection</option>
                                         @foreach ($structures as $struct)
-                                        	<option value="{{ $struct->id }}" style="background:#919c9e; color: #fff;">{{ $struct->wording }}</option>
+                                            @if ($struct->wording != "null")
+                                            <option value="{{ $struct->id }}" style="background:#919c9e; color: #fff;">{{ $struct->wording }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -104,7 +111,9 @@
                                     <select name="corps_id[]" class="form-control show-tick" data-live-search="true" multiple>
                                         <option value="null" style="background:#919c9e; color: #fff;">Pas de selection</option>
                                         @foreach ($corps as $cp)
-                                        	<option value="{{ $cp->id }}" style="background:#919c9e; color: #fff;">{{ $cp->wording }}</option>
+                                            @if ($cp->wording != "null")
+                                                <option value="{{ $cp->id }}" style="background:#919c9e; color: #fff;">{{ $cp->wording }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>

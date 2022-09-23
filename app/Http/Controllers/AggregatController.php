@@ -26,6 +26,16 @@ class AggregatController extends Controller
         $this->middleware('auth');
     }
 
+
+    public function ordonnerAnnee($annee){
+        $a = array();
+        foreach ($annee as $key => $value) {
+            $a[] = $value;
+        }
+        $a = array_unique($a);
+        sort($a);
+        return collect($a);
+    }
     public function index()
     {                                                                                                                       
         $id_status =  DB::table('type')->select('id')->where('wording','Statut')->first();
@@ -44,11 +54,13 @@ class AggregatController extends Controller
         $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
         $aggA = DB::table('retour_de_stages')->select('annee_rs')->distinct('annee_rs')->get();  
         foreach ($aggV as $val) {
-            $ann[] = $val->annee_stage;
+            if($val->annee_stage != "null") $ann[] = $val->annee_stage;
         }   
         foreach ($aggA as $val) {
-            $ann[] = $val->annee_rs;
+            if($val->annee_rs != "null") $ann[] = $val->annee_rs;
         } 
+
+        $ann = $this->ordonnerAnnee($ann);
         return view('admin.aggregat.index',compact('ann','sexes','statuts','categories','corps','structures','indics'));
         
     }
@@ -151,6 +163,7 @@ class AggregatController extends Controller
             $dataSheet->getCellByColumnAndRow($lHIndex,1)->setValue($ann);
             $lHIndex +=1;
         }
+        //dd($annee);
         
         $lVIndex = 2;
         $lHIndex = 1;
@@ -164,62 +177,52 @@ class AggregatController extends Controller
                             $w_cat = Level::where('id',$cat)->first()->wording;
                             $w_struct = Level::where('id',$struct)->first()->wording;
                             $w_cor = Level::where('id',$cor)->first()->wording;
-                            $h = $indicator->wording.$w_sexe.$w_statut.$w_cat.$w_struct.$w_cor;
-                            $aggregat = AggregatValue::where('hash_value',md5($h))->first();
-                            //dd($h,base64_encode($h),$aggregat);
-                            if ($aggregat == null) {
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($indic);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($indicator->wording);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($se);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_sexe);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($cor);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_cor);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($struct);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_struct);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($cat);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_cat);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($st);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_statut);
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue("Nombre");
-                                foreach ($annee as $ann) {
-                                        $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue(0);
-                                }
-                                $lHIndex = 1;
-                                $lVIndex +=1;
-                                continue;
 
+                            $dataSheet->getCellByColumnAndRow($lHIndex,$lVIndex)->setValue($indic);
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($indicator->wording);
+                            if($w_sexe != "null") {
+                                $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($se);
+                                $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($w_sexe);
                             }
+                            if($w_cor != "null") {
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($cor);
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($w_cor);
+                            }
+                            if($w_struct != "null") {
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($struct);
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($w_struct);
+                            }
+                            if($w_cat != "null") {
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($cat);
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($w_cat);
+                            }
+                            if($w_statut != "null") {
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($st);
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($w_statut);
+                            }
+                            $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue("Nombre");
 
-                            //$agg = $aggregat[0];
-                            //dd($aggregat->where('annee',"2017")->keys()[0]);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($indic);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($indicator->wording);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($se);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_sexe);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($cor);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_cor);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($struct);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_struct);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($cat);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_cat);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($st);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($w_statut);
-                            $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue("Nombre");
+                            
                             foreach ($annee as $ann) {
-                                $dataSheet->getCellByColumnAndRow($lHIndex++,$lVIndex)->setValue($aggregat->value_statistic);
+                                $h = $indicator->wording.$w_sexe.$w_statut.$w_cat.$w_struct.$w_cor.$ann;
+                                $aggregat = AggregatValue::where('hash_value',md5($h))->first();
+                                //dd($ann,$h,base64_encode($h),$aggregat);
+                                if($aggregat == null){
+                                    $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue(0);
+                                }else {
+                                    $dataSheet->getCellByColumnAndRow(++$lHIndex,$lVIndex)->setValue($aggregat->value_statistic);
+                                }
+                                
                             }
 
                             $lHIndex = 1;
                             $lVIndex +=1;
-                            
+                          
                         }
                     }
                 }
             }
         }
-
-        //$aggVal = AggregatValue::where('hash_value',$h)->first();
-        $spreadsheet = $infoController->buildDataSheet($indicatorsArray, $types, $spreadsheet);
 
         $spreadsheet->setActiveSheetIndex(0);
 
@@ -236,47 +239,53 @@ class AggregatController extends Controller
     
 
     public function genererAggregat(Request $request){
-        $indics = $request->indicator;
-        $annees = $request->annee;
+        $indicsChosen = $request->indicator;
+        $anneesChosen = $request->annee;
 
-        $isIndicAll = in_array('-1',$indics);
-        $isAnneeAll = in_array('-1',$annees);
+        
 
         DB::delete('delete from aggregat_inputs');
         DB::delete('delete from aggregat_start');
+        DB::delete('delete from aggregat_values');
+        $indics  =  Indicators::whereIn('id', [225,226,251,252])->get(); 
+        $ann = collect();
+        $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
+        $aggA = DB::table('retour_de_stages')->select('annee_rs')->distinct('annee_rs')->get();  
+        foreach ($aggV as $val) {
+            if($val->annee_stage != "null") $ann[] = $val->annee_stage;
+        }   
+        foreach ($aggA as $val) {
+            if($val->annee_rs != "null") $ann[] = $val->annee_rs;
+        } 
 
-        if ($isIndicAll && $isAnneeAll) {
-            $indics  =  Indicators::whereIn('id', [225,226,251,252])->get(); 
-            $ann = collect();
-            $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
-            $aggA = DB::table('retour_de_stages')->select('annee_rs')->distinct('annee_rs')->get();  
-            foreach ($aggV as $val) {
-                $ann[] = $val->annee_stage;
-            }   
-            foreach ($aggA as $val) {
-                $ann[] = $val->annee_rs;
-            } 
+        $ann = $this->ordonnerAnnee($ann);
+        $isIndicAll = in_array('-1',$indicsChosen);
+        $isAnneeAll = in_array('-1',$anneesChosen);
+        if ($isIndicAll && $isAnneeAll) { 
             foreach ($indics as $indic) {
                 foreach ($ann as $an) {
                     DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic->id,$an]);
                 }
             }
-            
         }elseif ($isIndicAll && !$isAnneeAll) {
-            foreach ($annees as $ann) {
-                DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', ["-1",$ann]);
-            }
-        }elseif (!$isIndicAll && $isAnneeAll) {
             foreach ($indics as $indic) {
-                DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic,"-1"]);
-            }
-        }else {
-            foreach ($indics as $indic) {
-                foreach ($annees as $ann) {
-                    DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic,$ann]);
+                foreach ($anneesChosen as $an) {
+                    DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic->id,$an]);
                 }
             }
-        }
+        }elseif (!$isIndicAll && $isAnneeAll) {
+            foreach ($indicsChosen as $indic) {
+                foreach ($ann as $an) {
+                    DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic,$an]);
+                }
+            }
+        }else {
+            foreach ($indicsChosen as $indic) {
+                foreach ($anneesChosen as $an) {
+                    DB::insert('insert into aggregat_inputs (indic,annee) values (?,?)', [$indic,$an]);
+                }
+            }
+        } 
 
         $start  = DB::insert('insert into aggregat_start (start) values("5")');
         if($start){

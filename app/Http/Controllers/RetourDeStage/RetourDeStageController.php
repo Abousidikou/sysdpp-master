@@ -172,6 +172,7 @@ class RetourDeStageController extends Controller
         //dd($file->getClientOriginalExtension());
         $validator = Validator::make($request->all(), $rules);
         $linesWithError = [];
+        $errormsg = "";
         if(!in_array($extension,$allowed))
         {
             return redirect()->back()->with('validation','error');
@@ -192,15 +193,20 @@ class RetourDeStageController extends Controller
             {
                 
                 $currentMatricule = $retour_stage->getCellByColumnAndRow(1,$i)->getValue();
+                if(!is_int($currentMatricule)) $currentMatricule =  $retour_stage->getCellByColumnAndRow(1,$i)->getCalculatedValue();
                 $numero_decision_rs = $retour_stage->getCellByColumnAndRow(3,$i)->getValue();
                 $date_signature = $retour_stage->getCellByColumnAndRow(4,$i)->getValue();
                 $date_fin_formation =  $retour_stage->getCellByColumnAndRow(5,$i)->getValue();
                 $date_reprise_service = $retour_stage->getCellByColumnAndRow(6,$i)->getValue();
                 $categorieCode = $retour_stage->getCellByColumnAndRow(7,$i)->getValue();
+                if(!is_int($categorieCode)) $categorieCode =  $retour_stage->getCellByColumnAndRow(7,$i)->getCalculatedValue();
                 $anneeCode = $retour_stage->getCellByColumnAndRow(9,$i)->getValue();
+                if(!is_int($anneeCode)) $anneeCode =  $retour_stage->getCellByColumnAndRow(9,$i)->getCalculatedValue();
                 $incidence_bn = $retour_stage->getCellByColumnAndRow(11,$i)->getValue();
                 $structureCode = $retour_stage->getCellByColumnAndRow(12,$i)->getValue();
+                if(!is_int($structureCode)) $structureCode =  $retour_stage->getCellByColumnAndRow(12,$i)->getCalculatedValue();
 
+                if($currentMatricule == null) break;
                 $categorie = "";
                 if ($categorieCode != null) {
                     if($categorieCode instanceof RichText)
@@ -215,7 +221,8 @@ class RetourDeStageController extends Controller
                     
                     $cat = Level::where('id',$categorieCode)->first();
                     if($cat == null){
-                        return redirect()->back()->with('nomenclatureError','error');
+                        $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base";
+                        return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $categorie = $cat->wording;
                 }else {
@@ -232,14 +239,19 @@ class RetourDeStageController extends Controller
                     {
                         $anneeCode = (string)$anneeCode;
                     }
+                    
                     //Formation
                     $annee = DB::table('annee')->where('id',$anneeCode)->first();
                     if ($annee == null) {
-                        return redirect()->back()->with('nomenclatureError','error');
+                        $NotCorrect = "L'annee  fournie à la ligne ".$i." n'est pas dans la base";
+                        return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $ann = $annee->value;
                 } else {
-                    $ann == "null";
+                    if ($anneeCode == null) {
+                        $NotCorrect = "anneeCode au niveau de la ligne ".$i." n'est pas correct ou est null";
+                        return redirect()->back()->with('nomenclatureError',$NotCorrect);
+                    }
                 }
                 
 
@@ -256,7 +268,8 @@ class RetourDeStageController extends Controller
                     // Formating
                     $struct = Level::where('id',$structureCode)->first();
                     if($struct == null){
-                        return redirect()->back()->with('nomenclatureError','error');
+                        $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base";
+                        return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $structureName = $struct->wording;
                 } else {
@@ -323,6 +336,7 @@ class RetourDeStageController extends Controller
                 }
                 if(!$this->agentExist($currentMatricule))
                 {
+                    $errormsg = "l'Agent n'existe pas.";
                     $linesWithError[] = $i;
                 }
                 else
@@ -344,6 +358,7 @@ class RetourDeStageController extends Controller
                     }
                     else
                     {
+                        $errormsg = "l'Erreur s'est produite lors de la mise des données dans la base";
                         $linesWithError[] = $i;
                     }
                 }
@@ -363,7 +378,7 @@ class RetourDeStageController extends Controller
                 $writer->save($path);
 
                 return redirect()->back()->with("path","template/unsaved.xlsx") 
-                                        ->with('warning','warning');
+                ->with('warning',$errormsg);
             }
 
         }
@@ -379,21 +394,6 @@ class RetourDeStageController extends Controller
         {
             return false;
         }
-        $mised = MiseEnStage::where('id_agent',$agent->id)->count();
-        if($mised != 0)
-        {
-            $retoured = RetourDeStage::where('id_agent',$agent->id)->count();
-            if($retoured == 0) {
-                return true;
-            }
-
-            if ($mised - $retoured == 1)  {
-                return true;
-            }
-
-            return false;
-        }
-
         return false;
     }
 

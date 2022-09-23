@@ -201,6 +201,7 @@ class MiseEnStageController extends Controller
         //dd($file->getClientOriginalExtension());
         $validator = Validator::make($request->all(), $rules);
         $linesWithError = [];
+        $errormsg = "";
         if(!in_array($extension,$allowed))
         {
             return redirect()->back()->with('validation','error');
@@ -219,10 +220,9 @@ class MiseEnStageController extends Controller
 
             for($i = 2; $i <= $numberOfRow; $i++)
             {
-
-                if($i < 30 )continue;
-
+                
                 $currentMatricule = $mise_stage->getCellByColumnAndRow(1,$i)->getValue();
+                if(!is_int($currentMatricule)) $currentMatricule =  $mise_stage->getCellByColumnAndRow(1,$i)->getCalculatedValue();
                 $date_signature = $mise_stage->getCellByColumnAndRow(3,$i)->getValue();
                 $date_demarrage_stage = $mise_stage->getCellByColumnAndRow(4,$i)->getValue();
                 $numero_decision_ms = $mise_stage->getCellByColumnAndRow(5,$i)->getValue();
@@ -239,8 +239,9 @@ class MiseEnStageController extends Controller
                 $cityCode = $mise_stage->getCellByColumnAndRow(15,$i)->getValue();
                 $ecole_stage = $mise_stage->getCellByColumnAndRow(17,$i)->getValue();
 
-                
-
+                //if($i == 3) dd($currentMatricule);
+                if($currentMatricule == null) break;
+                //dd($isBoursier);
                 if ($isBoursier != null) {
                     if($isBoursier instanceof RichText)
                     {
@@ -252,7 +253,8 @@ class MiseEnStageController extends Controller
                     }
                     //Test
                     if ($isBoursier != "1" && $isBoursier != "0") {
-                        return redirect()->back()->with('nomenclatureError','error');
+                        $NotCorrect = "IsBouriser au niveau de la ligne ".$i." n'est pas correct";
+                        return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     } 
                 } else {
                     $isBoursier = 0;
@@ -270,7 +272,8 @@ class MiseEnStageController extends Controller
 
                 
                 if ($cityCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "CityCode au niveau de la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 
                 if($cityCode instanceof RichText)
@@ -286,7 +289,8 @@ class MiseEnStageController extends Controller
                 // appel a model 
                 $city = City::where('id',$cityCode)->first();
                 if ($city == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le code de ville fourni à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 //Appel a state
                 $state = State::where('id',$city->state_id)->first();
@@ -313,7 +317,8 @@ class MiseEnStageController extends Controller
 
                 
                 if ($anneeCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "AnneeCode au niveau de la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($anneeCode instanceof RichText)
                 {
@@ -327,7 +332,8 @@ class MiseEnStageController extends Controller
                 // appel a model 
                 $annee = DB::table('annee')->where('id',$anneeCode)->first();
                 if ($annee == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le code de l'année fourni à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 if($duree instanceof RichText)
@@ -387,9 +393,11 @@ class MiseEnStageController extends Controller
                 {
                     $currentMatricule = (string)$currentMatricule;
                 }
+                
                 if(!$this->agentExist($currentMatricule))
                 {
-                   
+                    
+                    $errormsg = "l'Agent n'existe pas pour être mise en stage.";
                     $linesWithError[] = $i;
                 }
                 else
@@ -407,7 +415,7 @@ class MiseEnStageController extends Controller
                     $mise_s->filiere = $filiere;
                     $mise_s->spec_option = $spec_option;
                     $mise_s->ecole_stage = $ecole_stage;
-                    $mise_s->duree = $duree;
+                    $mise_s->duree = $duree;    
                     $mise_s->annee_stage = $annee->value;
                     $mise_s->pays_stage_id = $country->id;
                     $mise_s->region_stage_id = $state->id;
@@ -419,7 +427,7 @@ class MiseEnStageController extends Controller
                     }
                     else
                     {
-                        
+                        $errormsg = "l'Erreur s'est produite lors de la mise des données dans la base";
                         $linesWithError[] = $i;
                     }
                 }
@@ -439,7 +447,7 @@ class MiseEnStageController extends Controller
                 $writer->save($path);
 
                 return redirect()->back()->with("path","template/unsaved.xlsx") 
-                                        ->with('warning','warning');
+                                        ->with('warning',$errormsg);
             }
 
         }
@@ -451,26 +459,12 @@ class MiseEnStageController extends Controller
         
         $matricule = trim(strtolower($mat));
         $agent = AgentFormation::where('matricule',$matricule)->first();
+        
         if($agent == null)
         {
             return false;
         }
-        $mised = MiseEnStage::where('id_agent',$agent->id)->count();
-        if($mised != 0)
-        {
-            $retoured = RetourDeStage::where('id_agent',$agent->id)->count();
-            if($retoured == 0) {
-                return false;
-            }
-
-            if ($mised - $retoured == 1)  {
-                return false;
-            }
-
-            return true;
-
-        }
-       
+        
         return true;
     }
 

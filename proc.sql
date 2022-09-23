@@ -23,6 +23,13 @@ BEGIN
     DECLARE count_cat INT;
     DECLARE count_str INT;
     DECLARE count_cor INT;
+
+    DECLARE count_se_Total INT DEFAULT 2;
+    DECLARE count_st_Total INT DEFAULT 2;
+    DECLARE count_cat_Total INT DEFAULT 2;
+    DECLARE count_str_Total INT DEFAULT 2;
+    DECLARE count_cor_Total INT DEFAULT 2;
+    
     DECLARE done INT DEFAULT FALSE;
     DECLARE cursor_e CURSOR FOR SELECT agent_formations.sexe,agent_formations.status,agent_formations.corps,agent_formations.categorie,agent_formations.structure FROM mise_en_stages INNER JOIN agent_formations ON agent_formations.id=mise_en_stages.id_agent where mise_en_stages.annee_stage=yearr COLLATE utf8mb4_unicode_ci and mise_en_stages.isBoursier=0 COLLATE utf8mb4_unicode_ci;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -34,54 +41,87 @@ BEGIN
             END IF;
             
             SELECT wording INTO cursor_indic FROM indicators WHERE id=indic COLLATE utf8mb4_unicode_ci;
+
+
+            
+            IF ( cursor_sexe = "null"  )   THEN
+                SET count_se_Total = 1;
+            ELSE
+                SET count_se_Total = 2;
+            END IF;
             SET count_se = 0;
-            WHILE count_se < 2 DO
+            WHILE count_se < count_se_Total DO
                 IF ( count_se = 0 ) THEN
                     SET c_se = cursor_sexe;
                 ELSEIF ( count_se = 1 ) THEN
                     SET c_se = "null";
                 End IF;
+                
+                IF ( cursor_statuts = "null"  )   THEN
+                    SET count_st_Total = 1;
+                ELSE
+                    SET count_st_Total = 2;
+                END IF;
             	SET count_st = 0;
-                WHILE  count_st < 2 DO
+                WHILE  count_st < count_st_Total DO
                     IF ( count_st = 0 ) THEN
                         SET c_st = cursor_statuts;
                     ELSEIF ( count_st = 1 ) THEN
                         SET c_st = "null";
                     End IF;
+
+                    IF ( cursor_categorie = "null"  )   THEN
+                        SET count_cat_Total = 1;
+                    ELSE
+                        SET count_cat_Total = 2;
+                    END IF;
                 	SET count_cat  = 0;
-                    WHILE count_cat < 2 DO
+                    WHILE count_cat < count_cat_Total DO
                         IF ( count_cat = 0 ) THEN
                             SET c_cat = cursor_categorie;
                         ELSEIF ( count_cat = 1 ) THEN
                             SET c_cat = "null";
                         End IF;
+
+                        IF ( cursor_structure = "null"  )   THEN
+                            SET count_str_Total = 1;
+                        ELSE
+                            SET count_str_Total = 2;
+                        END IF;
 						SET count_str = 0;
-                        WHILE  count_str < 2 DO
+                        WHILE  count_str < count_str_Total DO
                             IF ( count_str = 0 ) THEN
                                 SET c_str = cursor_structure;
                             ELSEIF ( count_str = 1 ) THEN
                                 SET c_str = "null";
                             End IF;
+
+                            IF ( cursor_corps = "null"  )   THEN
+                                SET count_cor_Total = 1;
+                            ELSE
+                                SET count_cor_Total = 2;
+                            END IF;
                         	SET count_cor = 0;
-                            WHILE  count_cor < 2 DO
+                            WHILE  count_cor < count_cor_Total DO
                                 IF ( count_cor = 0 ) THEN
                                     SET c_cor = cursor_corps;
                                 ELSEIF ( count_cor = 1 ) THEN
                                     SET c_cor = "null";
                                 End IF;
-                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor))  INTO  result;
+                                
+                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor,yearr))  INTO  result;
                                 SELECT COUNT(*) INTO row_count FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
 
                                 IF ( row_count = 0 ) THEN
                                     INSERT INTO aggregat_values (hash_value,annee,value_statistic)
                                     VALUES (result,yearr, 1);
-                                    INSERT INTO aggregat_test (hash_,indic,sexe) VALUES (CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor),1,result) ;
                                 ELSE
                                     SELECT value_statistic INTO val FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
                                     SET val = val + 1;
-                                    INSERT INTO aggregat_test (hash_,indic,sexe) VALUES (CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor),val,result) ;
                                     UPDATE aggregat_values SET value_statistic = val WHERE hash_value=result COLLATE utf8mb4_unicode_ci;
                                 END IF;
+
+
                             	SET count_cor = count_cor + 1;
                             END WHILE;
                         	SET count_str = count_str + 1;
@@ -127,6 +167,12 @@ BEGIN
     DECLARE count_cat INT;
     DECLARE count_str INT;
     DECLARE count_cor INT;
+
+    DECLARE count_se_Total INT DEFAULT 2;
+    DECLARE count_st_Total INT DEFAULT 2;
+    DECLARE count_cat_Total INT DEFAULT 2;
+    DECLARE count_str_Total INT DEFAULT 2;
+    DECLARE count_cor_Total INT DEFAULT 2;
     
     DECLARE done INT DEFAULT FALSE;
     DECLARE cursor_e CURSOR FOR SELECT agent_formations.sexe,agent_formations.status,agent_formations.corps,agent_formations.categorie,agent_formations.structure FROM retour_de_stages INNER JOIN agent_formations ON agent_formations.id=retour_de_stages.id_agent where retour_de_stages.annee_rs=yearr COLLATE utf8mb4_unicode_ci;
@@ -139,42 +185,75 @@ BEGIN
             END IF;
             
             SELECT wording INTO cursor_indic FROM indicators WHERE id=indic COLLATE utf8mb4_unicode_ci;
+
+
+            
+            IF ( cursor_sexe = "null"  )   THEN
+                SET count_se_Total = 1;
+            ELSE
+                SET count_se_Total = 2;
+            END IF;
             SET count_se = 0;
-            WHILE count_se < 2 DO
+            WHILE count_se < count_se_Total DO
                 IF ( count_se = 0 ) THEN
                     SET c_se = cursor_sexe;
                 ELSEIF ( count_se = 1 ) THEN
                     SET c_se = "null";
                 End IF;
+                
+                IF ( cursor_statuts = "null"  )   THEN
+                    SET count_st_Total = 1;
+                ELSE
+                    SET count_st_Total = 2;
+                END IF;
             	SET count_st = 0;
-                WHILE  count_st < 2 DO
+                WHILE  count_st < count_st_Total DO
                     IF ( count_st = 0 ) THEN
                         SET c_st = cursor_statuts;
                     ELSEIF ( count_st = 1 ) THEN
                         SET c_st = "null";
                     End IF;
+
+                    IF ( cursor_categorie = "null"  )   THEN
+                        SET count_cat_Total = 1;
+                    ELSE
+                        SET count_cat_Total = 2;
+                    END IF;
                 	SET count_cat  = 0;
-                    WHILE count_cat < 2 DO
+                    WHILE count_cat < count_cat_Total DO
                         IF ( count_cat = 0 ) THEN
                             SET c_cat = cursor_categorie;
                         ELSEIF ( count_cat = 1 ) THEN
                             SET c_cat = "null";
                         End IF;
+
+                        IF ( cursor_structure = "null"  )   THEN
+                            SET count_str_Total = 1;
+                        ELSE
+                            SET count_str_Total = 2;
+                        END IF;
 						SET count_str = 0;
-                        WHILE  count_str < 2 DO
+                        WHILE  count_str < count_str_Total DO
                             IF ( count_str = 0 ) THEN
                                 SET c_str = cursor_structure;
                             ELSEIF ( count_str = 1 ) THEN
                                 SET c_str = "null";
                             End IF;
+
+                            IF ( cursor_corps = "null"  )   THEN
+                                SET count_cor_Total = 1;
+                            ELSE
+                                SET count_cor_Total = 2;
+                            END IF;
                         	SET count_cor = 0;
-                            WHILE  count_cor < 2 DO
+                            WHILE  count_cor < count_cor_Total DO
                                 IF ( count_cor = 0 ) THEN
                                     SET c_cor = cursor_corps;
                                 ELSEIF ( count_cor = 1 ) THEN
                                     SET c_cor = "null";
                                 End IF;
-                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor))  INTO  result;
+                                
+                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor,yearr))  INTO  result;
                                 SELECT COUNT(*) INTO row_count FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
 
                                 IF ( row_count = 0 ) THEN
@@ -185,6 +264,8 @@ BEGIN
                                     SET val = val + 1;
                                     UPDATE aggregat_values SET value_statistic = val WHERE hash_value=result COLLATE utf8mb4_unicode_ci;
                                 END IF;
+
+                                
                             	SET count_cor = count_cor + 1;
                             END WHILE;
                         	SET count_str = count_str + 1;
@@ -228,6 +309,12 @@ BEGIN
     DECLARE count_cat INT;
     DECLARE count_str INT;
     DECLARE count_cor INT;
+
+    DECLARE count_se_Total INT DEFAULT 2;
+    DECLARE count_st_Total INT DEFAULT 2;
+    DECLARE count_cat_Total INT DEFAULT 2;
+    DECLARE count_str_Total INT DEFAULT 2;
+    DECLARE count_cor_Total INT DEFAULT 2;
     
     DECLARE done INT DEFAULT FALSE;
     DECLARE cursor_e CURSOR FOR SELECT agent_formations.sexe,agent_formations.status,agent_formations.corps,agent_formations.categorie,agent_formations.structure FROM mise_en_stages INNER JOIN agent_formations ON agent_formations.id=mise_en_stages.id_agent where mise_en_stages.annee_stage=yearr COLLATE utf8mb4_unicode_ci;
@@ -240,42 +327,75 @@ BEGIN
             END IF;
             
             SELECT wording INTO cursor_indic FROM indicators WHERE id=indic COLLATE utf8mb4_unicode_ci;
+
+
+            
+            IF ( cursor_sexe = "null"  )   THEN
+                SET count_se_Total = 1;
+            ELSE
+                SET count_se_Total = 2;
+            END IF;
             SET count_se = 0;
-            WHILE count_se < 2 DO
+            WHILE count_se < count_se_Total DO
                 IF ( count_se = 0 ) THEN
                     SET c_se = cursor_sexe;
                 ELSEIF ( count_se = 1 ) THEN
                     SET c_se = "null";
                 End IF;
+                
+                IF ( cursor_statuts = "null"  )   THEN
+                    SET count_st_Total = 1;
+                ELSE
+                    SET count_st_Total = 2;
+                END IF;
             	SET count_st = 0;
-                WHILE  count_st < 2 DO
+                WHILE  count_st < count_st_Total DO
                     IF ( count_st = 0 ) THEN
                         SET c_st = cursor_statuts;
                     ELSEIF ( count_st = 1 ) THEN
                         SET c_st = "null";
                     End IF;
+
+                    IF ( cursor_categorie = "null"  )   THEN
+                        SET count_cat_Total = 1;
+                    ELSE
+                        SET count_cat_Total = 2;
+                    END IF;
                 	SET count_cat  = 0;
-                    WHILE count_cat < 2 DO
+                    WHILE count_cat < count_cat_Total DO
                         IF ( count_cat = 0 ) THEN
                             SET c_cat = cursor_categorie;
                         ELSEIF ( count_cat = 1 ) THEN
                             SET c_cat = "null";
                         End IF;
+
+                        IF ( cursor_structure = "null"  )   THEN
+                            SET count_str_Total = 1;
+                        ELSE
+                            SET count_str_Total = 2;
+                        END IF;
 						SET count_str = 0;
-                        WHILE  count_str < 2 DO
+                        WHILE  count_str < count_str_Total DO
                             IF ( count_str = 0 ) THEN
                                 SET c_str = cursor_structure;
                             ELSEIF ( count_str = 1 ) THEN
                                 SET c_str = "null";
                             End IF;
+
+                            IF ( cursor_corps = "null"  )   THEN
+                                SET count_cor_Total = 1;
+                            ELSE
+                                SET count_cor_Total = 2;
+                            END IF;
                         	SET count_cor = 0;
-                            WHILE  count_cor < 2 DO
+                            WHILE  count_cor < count_cor_Total DO
                                 IF ( count_cor = 0 ) THEN
                                     SET c_cor = cursor_corps;
                                 ELSEIF ( count_cor = 1 ) THEN
                                     SET c_cor = "null";
                                 End IF;
-                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor))  INTO  result;
+                                
+                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor,yearr))  INTO  result;
                                 SELECT COUNT(*) INTO row_count FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
 
                                 IF ( row_count = 0 ) THEN
@@ -286,6 +406,9 @@ BEGIN
                                     SET val = val + 1;
                                     UPDATE aggregat_values SET value_statistic = val WHERE hash_value=result COLLATE utf8mb4_unicode_ci;
                                 END IF;
+
+                               
+
                             	SET count_cor = count_cor + 1;
                             END WHILE;
                         	SET count_str = count_str + 1;
@@ -305,7 +428,6 @@ DELIMITER ;
 
 
 DROP PROCEDURE IF EXISTS `AVECBOURSE`;
-
 DELIMITER $$
 CREATE  PROCEDURE `AVECBOURSE`(IN `indic` INT, IN `yearr` INT)
     NO SQL
@@ -330,6 +452,13 @@ BEGIN
     DECLARE count_cat INT;
     DECLARE count_str INT;
     DECLARE count_cor INT;
+
+    DECLARE count_se_Total INT DEFAULT 2;
+    DECLARE count_st_Total INT DEFAULT 2;
+    DECLARE count_cat_Total INT DEFAULT 2;
+    DECLARE count_str_Total INT DEFAULT 2;
+    DECLARE count_cor_Total INT DEFAULT 2;
+    
     DECLARE done INT DEFAULT FALSE;
     DECLARE cursor_e CURSOR FOR SELECT agent_formations.sexe,agent_formations.status,agent_formations.corps,agent_formations.categorie,agent_formations.structure FROM mise_en_stages INNER JOIN agent_formations ON agent_formations.id=mise_en_stages.id_agent where mise_en_stages.annee_stage=yearr COLLATE utf8mb4_unicode_ci and mise_en_stages.isBoursier=1 COLLATE utf8mb4_unicode_ci;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -341,54 +470,88 @@ BEGIN
             END IF;
             
             SELECT wording INTO cursor_indic FROM indicators WHERE id=indic COLLATE utf8mb4_unicode_ci;
+
+
+            
+            IF ( cursor_sexe = "null"  )   THEN
+                SET count_se_Total = 1;
+            ELSE
+                SET count_se_Total = 2;
+            END IF;
             SET count_se = 0;
-            WHILE count_se < 2 DO
+            WHILE count_se < count_se_Total DO
                 IF ( count_se = 0 ) THEN
                     SET c_se = cursor_sexe;
                 ELSEIF ( count_se = 1 ) THEN
                     SET c_se = "null";
                 End IF;
+                
+                IF ( cursor_statuts = "null"  )   THEN
+                    SET count_st_Total = 1;
+                ELSE
+                    SET count_st_Total = 2;
+                END IF;
             	SET count_st = 0;
-                WHILE  count_st < 2 DO
+                WHILE  count_st < count_st_Total DO
                     IF ( count_st = 0 ) THEN
                         SET c_st = cursor_statuts;
                     ELSEIF ( count_st = 1 ) THEN
                         SET c_st = "null";
                     End IF;
+
+                    IF ( cursor_categorie = "null"  )   THEN
+                        SET count_cat_Total = 1;
+                    ELSE
+                        SET count_cat_Total = 2;
+                    END IF;
                 	SET count_cat  = 0;
-                    WHILE count_cat < 2 DO
+                    WHILE count_cat < count_cat_Total DO
                         IF ( count_cat = 0 ) THEN
                             SET c_cat = cursor_categorie;
                         ELSEIF ( count_cat = 1 ) THEN
                             SET c_cat = "null";
                         End IF;
+
+                        IF ( cursor_structure = "null"  )   THEN
+                            SET count_str_Total = 1;
+                        ELSE
+                            SET count_str_Total = 2;
+                        END IF;
 						SET count_str = 0;
-                        WHILE  count_str < 2 DO
+                        WHILE  count_str < count_str_Total DO
                             IF ( count_str = 0 ) THEN
                                 SET c_str = cursor_structure;
                             ELSEIF ( count_str = 1 ) THEN
                                 SET c_str = "null";
                             End IF;
+
+                            IF ( cursor_corps = "null"  )   THEN
+                                SET count_cor_Total = 1;
+                            ELSE
+                                SET count_cor_Total = 2;
+                            END IF;
                         	SET count_cor = 0;
-                            WHILE  count_cor < 2 DO
+                            WHILE  count_cor < count_cor_Total DO
                                 IF ( count_cor = 0 ) THEN
                                     SET c_cor = cursor_corps;
                                 ELSEIF ( count_cor = 1 ) THEN
                                     SET c_cor = "null";
                                 End IF;
-                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor))  INTO  result;
+                                
+                                SELECT MD5(CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor,yearr))  INTO  result;
                                 SELECT COUNT(*) INTO row_count FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
 
                                 IF ( row_count = 0 ) THEN
                                     INSERT INTO aggregat_values (hash_value,annee,value_statistic)
                                     VALUES (result,yearr, 1);
-                                    INSERT INTO aggregat_test (hash_,indic,sexe) VALUES (CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor),1,result) ;
                                 ELSE
                                     SELECT value_statistic INTO val FROM aggregat_values WHERE hash_value=result COLLATE utf8mb4_unicode_ci AND annee=yearr COLLATE utf8mb4_unicode_ci;
                                     SET val = val + 1;
-                                    INSERT INTO aggregat_test (hash_,indic,sexe) VALUES (CONCAT(cursor_indic,c_se,c_st,c_cat,c_str,c_cor),val,result) ;
                                     UPDATE aggregat_values SET value_statistic = val WHERE hash_value=result COLLATE utf8mb4_unicode_ci;
                                 END IF;
+
+                               
+
                             	SET count_cor = count_cor + 1;
                             END WHILE;
                         	SET count_str = count_str + 1;
@@ -407,29 +570,7 @@ End$$
 DELIMITER ;
 
 
-DROP PROCEDURE IF EXISTS `ALLDONE`;
 
-DELIMITER $$
-CREATE PROCEDURE `ALLDONE`()
-    NO SQL
-BEGIN
-    DECLARE c_indic VARCHAR(255) DEFAULT "";
-    DECLARE c_annee VARCHAR(255) DEFAULT "";
-    DECLARE length INT DEFAULT 0;
-    DECLARE counter INT DEFAULT 0;
-
-    SELECT COUNT(*) FROM aggregat_inputs INTO length;
-    SET counter=0;
-    WHILE counter<length DO
-    	SELECT indic, annee INTO c_indic, c_annee FROM aggregat_inputs LIMIT counter,1;
-        CALL  AVECBOURSE(c_indic,c_annee);
-        CALL  MISEENSTAGE(c_indic,c_annee);
-        CALL  SANSBOURSE(c_indic,c_annee);
-        CALL  RETOURDESTAGE(c_indic,c_annee);
-        SET counter = counter + 1;
-    END WHILE;
-End$$
-DELIMITER ;
 
 DROP PROCEDURE IF EXISTS `CONTROLLER`;
 DELIMITER $$
@@ -453,8 +594,6 @@ BEGIN
             CALL  SANSBOURSE(c_indic,c_annee);
         ELSEIF ( c_indic = 252 ) THEN
             CALL  RETOURDESTAGE(c_indic,c_annee);
-        ELSE           
-            CALL  ALLDONE();
         END IF;
         SET counter = counter + 1;
     END WHILE;
@@ -512,7 +651,6 @@ BEGIN
             INSERT INTO annee (value) VALUES (row_count) ;
             SET row_count = row_count + 1;
     END WHILE;
-    INSERT INTO annee (value) VALUES ("null") ;
 End$$
 DELIMITER ;
 
@@ -548,11 +686,6 @@ INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '125', NULL, NULL);
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '122', NULL, NULL);
 INSERT INTO `levelofdisintegration` (`id`, `wording`, `id_type`, `created_at`, `updated_at`) VALUES (NULL, 'null', '124', NULL, NULL);
-INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Abomey-Calavi', '447');
-INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Sékou', '447');
-INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Porto-Novo', '447');
-INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Abidjan', '850');
-INSERT INTO `cities` (`id`, `name`, `state_id`) VALUES (NULL, 'Louvain', '424');
 ALTER TABLE `mise_en_stages`  ADD `isBoursier` BOOLEAN NOT NULL  AFTER `nature_bourse`;
 
 

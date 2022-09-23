@@ -30,6 +30,16 @@ class AgentFormationController extends Controller
     }
 
 
+    public function ordonnerAnnee($annee){
+        $a = array();
+        foreach ($annee as $key => $value) {
+            $a[] = $value;
+        }
+        $a = array_unique($a);
+        sort($a);
+        return collect($a);
+    }
+
     public function index()
     {
     	$agents = AgentFormation::all();
@@ -37,11 +47,13 @@ class AgentFormationController extends Controller
         $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
         $aggA = DB::table('retour_de_stages')->select('annee_rs')->distinct('annee_rs')->get();  
         foreach ($aggV as $val) {
-            $ann[] = $val->annee_stage;
+            if($val->annee_stage != "null") $ann[] = $val->annee_stage;
         }   
         foreach ($aggA as $val) {
-            $ann[] = $val->annee_rs;
+            if($val->annee_rs != "null") $ann[] = $val->annee_rs;
         } 
+
+        $ann = $this->ordonnerAnnee($ann);
     	return view('admin.agentFormation.agentFormation',compact('agents','ann'));
     }
 
@@ -521,6 +533,7 @@ class AgentFormationController extends Controller
             for($i = 2; $i <= $numberOfRow; $i++)
             {
                 $currentMatricule = $agentsheet->getCellByColumnAndRow(1,$i)->getValue();
+                if(!is_int($currentMatricule)) $currentMatricule =  $agentsheet->getCellByColumnAndRow(1,$i)->getCalculatedValue();
                 $currentName = $agentsheet->getCellByColumnAndRow(2,$i)->getValue();
                 $currentDiplome = $agentsheet->getCellByColumnAndRow(3,$i)->getValue();
                 $sexeCode = $agentsheet->getCellByColumnAndRow(4,$i)->getValue();
@@ -548,7 +561,8 @@ class AgentFormationController extends Controller
                 
                 /* Statut */ 
                 if ($statusCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le statusCode  fourni à la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 //dd($statusCode,$sexeCode,$cateCode,$corpsCode,$structureCode);
                 if($statusCode instanceof RichText)
@@ -561,13 +575,15 @@ class AgentFormationController extends Controller
                 }
                 $status = Level::where('id',$statusCode)->first();
                 if($status == null){
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le status  fourni à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 /* Categorie */ 
 
                 if ($cateCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le cateCode  fourni à la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($cateCode instanceof RichText)
                 {
@@ -578,10 +594,15 @@ class AgentFormationController extends Controller
                     $cateCode = (string)$cateCode;
                 }
                 $cat = Level::where('id',$cateCode)->first();
+                if($cat == null){
+                    $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
+                }
 
                 /* Corps */
                 if ($corpsCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le corpsCode  fourni à la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($corpsCode instanceof RichText)
                 {
@@ -594,11 +615,13 @@ class AgentFormationController extends Controller
                 // Formating
                 $corps = Level::where('id',$corpsCode)->first();
                 if($corps == null){
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le corps  fourni à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 if ($structureCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le strucureCode  fourni à la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($structureCode instanceof RichText)
                 {
@@ -611,7 +634,8 @@ class AgentFormationController extends Controller
                 // Formating
                 $struct = Level::where('id',$structureCode)->first();
                 if($struct == null){
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
 
@@ -627,11 +651,13 @@ class AgentFormationController extends Controller
 
                 //Formating   
                 if ($sexeCode == null) {
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le sexeCode  fourni à la ligne ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 $sexe = Level::where('id',$sexeCode)->first();
                 if($sexe == null){
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le sexe  fourni à la ligne ".$i." n'est pas dans la base";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 
 
@@ -645,7 +671,8 @@ class AgentFormationController extends Controller
                 }
                 //Formating
                 if($currentName == "null" || $currentName == null){
-                    return redirect()->back()->with('nomenclatureError','error');
+                    $NotCorrect = "Le nom et prenom de l'agent à la ligne  ".$i." n'est pas correct";
+                    return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
 
@@ -659,6 +686,7 @@ class AgentFormationController extends Controller
                 }
                 if($this->agentExist($currentMatricule))
                 {   
+                    $errormsg = "l'Agent existe deja.";
                     $linesWithError[] = $i;
                 }
                 else
@@ -679,6 +707,7 @@ class AgentFormationController extends Controller
                     }
                     else
                     {
+                        $errormsg = "l'Erreur s'est produite lors de la mise des données dans la base";
                         $linesWithError[] = $i;
                     }
                 }
@@ -698,7 +727,7 @@ class AgentFormationController extends Controller
                 $writer->save($path);
 
                 return redirect()->back()->with("path","template/unsaved.xlsx") 
-                                        ->with('warning','warning');
+                                        ->with('warning',$errormsg);
             }
 
         }

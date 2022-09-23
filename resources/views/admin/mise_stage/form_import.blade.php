@@ -80,6 +80,7 @@
                             Des erreurs sont survenues lors du traitement du fichier<br>
 
                             Toutes les donnees n'ont pu etre sauvegarde<br>
+                            <strong>{{ session('warning') }}</strong>
 
                             Veuillez voir ci-joint le fichier contenant les lignes non enregistrees<br>
                             Veillez vérifier que l'agent existe déjà <br>
@@ -96,9 +97,9 @@
 
                             Des erreurs sont survenues lors du traitement du fichier<br>
 
-                            Les données des champs <strong>Matricule, Nom & prénoms, CityCode</strong> ne sont pas corrects. <br>
+                            <strong>{{ session('nomenclatureError') }}</strong> <br>
                             
-                            Les champs doivent être dans le même ordre que dans l'examplaire. <em>Générer un exemplaire pour plus de précision.</em> <br>
+                            Les champs doivent être dans le même ordre que  dans l'examplaire et corrects. <em>Générer un exemplaire pour plus de précision.</em> <br>
                             Veuillez les corriger puis réessayer.
                         </div>
 
