@@ -36,7 +36,7 @@ class ReadController extends Controller
         $levelToFilterWith = [];
         foreach ($levelstf as $lev => $values) {
             //dd($lev);
-            if($values != 'null' && $lev != 'filter' && $lev != 'plus') {
+            if($values != 'null' && $values != null && $lev != 'filter' && $lev != 'plus') {
                 $levelToFilterWith[] = $values;
             }
         }
