@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `aggregat_values`
 --
-
+DROP TABLE IF EXISTS `aggregat_values`;
 CREATE TABLE `aggregat_values` (
   `id` int UNSIGNED NOT NULL,
   `hash_value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

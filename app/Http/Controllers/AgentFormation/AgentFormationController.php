@@ -561,7 +561,7 @@ class AgentFormationController extends Controller
                 
                 /* Statut */ 
                 if ($statusCode == null) {
-                    $NotCorrect = "Le statusCode  fourni à la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "Le statusCode  fourni à la ligne ".$i." n'est pas correct.<br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 //dd($statusCode,$sexeCode,$cateCode,$corpsCode,$structureCode);
@@ -575,14 +575,14 @@ class AgentFormationController extends Controller
                 }
                 $status = Level::where('id',$statusCode)->first();
                 if($status == null){
-                    $NotCorrect = "Le status  fourni à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "Le status  fourni à la ligne ".$i." n'est pas dans la base. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 /* Categorie */ 
 
                 if ($cateCode == null) {
-                    $NotCorrect = "Le cateCode  fourni à la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "Le cateCode  fourni à la ligne ".$i." n'est pas correct. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($cateCode instanceof RichText)
@@ -595,13 +595,13 @@ class AgentFormationController extends Controller
                 }
                 $cat = Level::where('id',$cateCode)->first();
                 if($cat == null){
-                    $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 /* Corps */
                 if ($corpsCode == null) {
-                    $NotCorrect = "Le corpsCode  fourni à la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "Le corpsCode  fourni à la ligne ".$i." n'est pas correct. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($corpsCode instanceof RichText)
@@ -615,12 +615,12 @@ class AgentFormationController extends Controller
                 // Formating
                 $corps = Level::where('id',$corpsCode)->first();
                 if($corps == null){
-                    $NotCorrect = "Le corps  fourni à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "Le corps  fourni à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
                 if ($structureCode == null) {
-                    $NotCorrect = "Le strucureCode  fourni à la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "Le strucureCode  fourni à la ligne ".$i." n'est pas correct. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($structureCode instanceof RichText)
@@ -634,7 +634,7 @@ class AgentFormationController extends Controller
                 // Formating
                 $struct = Level::where('id',$structureCode)->first();
                 if($struct == null){
-                    $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
@@ -651,12 +651,12 @@ class AgentFormationController extends Controller
 
                 //Formating   
                 if ($sexeCode == null) {
-                    $NotCorrect = "Le sexeCode  fourni à la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "Le sexeCode  fourni à la ligne ".$i." n'est pas correct. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 $sexe = Level::where('id',$sexeCode)->first();
                 if($sexe == null){
-                    $NotCorrect = "Le sexe  fourni à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "Le sexe  fourni à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 
@@ -671,7 +671,7 @@ class AgentFormationController extends Controller
                 }
                 //Formating
                 if($currentName == "null" || $currentName == null){
-                    $NotCorrect = "Le nom et prenom de l'agent à la ligne  ".$i." n'est pas correct";
+                    $NotCorrect = "Le nom et prenom de l'agent à la ligne  ".$i." n'est pas correct. <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
@@ -707,7 +707,7 @@ class AgentFormationController extends Controller
                     }
                     else
                     {
-                        $errormsg = "l'Erreur s'est produite lors de la mise des données dans la base";
+                        $errormsg = "l'Erreur s'est produite lors de la mise des données dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         $linesWithError[] = $i;
                     }
                 }

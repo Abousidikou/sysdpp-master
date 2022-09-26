@@ -262,7 +262,7 @@ class AggregatController extends Controller
         $isIndicAll = in_array('-1',$indicsChosen);
         $isAnneeAll = in_array('-1',$anneesChosen);
         foreach ($ann as $an) {
-            DB::delete('delete from aggregat_values')->where('annee',$an);
+            DB::table('aggregat_values')->where('annee',$an)->delete();
         }
         
         if ($isIndicAll && $isAnneeAll) { 

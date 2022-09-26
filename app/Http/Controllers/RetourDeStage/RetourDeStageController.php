@@ -221,7 +221,7 @@ class RetourDeStageController extends Controller
                     
                     $cat = Level::where('id',$categorieCode)->first();
                     if($cat == null){
-                        $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base";
+                        $NotCorrect = "La categorie  fournie à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $categorie = $cat->wording;
@@ -243,13 +243,13 @@ class RetourDeStageController extends Controller
                     //Formation
                     $annee = DB::table('annee')->where('id',$anneeCode)->first();
                     if ($annee == null) {
-                        $NotCorrect = "L'annee  fournie à la ligne ".$i." n'est pas dans la base";
+                        $NotCorrect = "L'annee  fournie à la ligne ".$i." n'est pas correct.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $ann = $annee->value;
                 } else {
                     if ($anneeCode == null) {
-                        $NotCorrect = "anneeCode au niveau de la ligne ".$i." n'est pas correct ou est null";
+                        $NotCorrect = "anneeCode au niveau de la ligne ".$i." n'est pas correct ou est null.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                 }
@@ -268,7 +268,7 @@ class RetourDeStageController extends Controller
                     // Formating
                     $struct = Level::where('id',$structureCode)->first();
                     if($struct == null){
-                        $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base";
+                        $NotCorrect = "La structure  fournie à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     }
                     $structureName = $struct->wording;

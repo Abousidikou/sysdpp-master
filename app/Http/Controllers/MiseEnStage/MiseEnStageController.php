@@ -253,7 +253,7 @@ class MiseEnStageController extends Controller
                     }
                     //Test
                     if ($isBoursier != "1" && $isBoursier != "0") {
-                        $NotCorrect = "IsBouriser au niveau de la ligne ".$i." n'est pas correct";
+                        $NotCorrect = "IsBouriser au niveau de la ligne ".$i." n'est pas correct.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                         return redirect()->back()->with('nomenclatureError',$NotCorrect);
                     } 
                 } else {
@@ -272,7 +272,7 @@ class MiseEnStageController extends Controller
 
                 
                 if ($cityCode == null) {
-                    $NotCorrect = "CityCode au niveau de la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "CityCode au niveau de la ligne ".$i." n'est pas correct.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 
@@ -289,7 +289,7 @@ class MiseEnStageController extends Controller
                 // appel a model 
                 $city = City::where('id',$cityCode)->first();
                 if ($city == null) {
-                    $NotCorrect = "Le code de ville fourni à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "Le code de ville fourni à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 //Appel a state
@@ -317,7 +317,7 @@ class MiseEnStageController extends Controller
 
                 
                 if ($anneeCode == null) {
-                    $NotCorrect = "AnneeCode au niveau de la ligne ".$i." n'est pas correct";
+                    $NotCorrect = "AnneeCode au niveau de la ligne ".$i." n'est pas correct.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
                 if($anneeCode instanceof RichText)
@@ -332,7 +332,7 @@ class MiseEnStageController extends Controller
                 // appel a model 
                 $annee = DB::table('annee')->where('id',$anneeCode)->first();
                 if ($annee == null) {
-                    $NotCorrect = "Le code de l'année fourni à la ligne ".$i." n'est pas dans la base";
+                    $NotCorrect = "Le code de l'année fourni à la ligne ".$i." n'est pas dans la base.  <br> Veillez retirer du fichier les lignes précédentes car déjà <em>enrégistrées</em> ou vous courrez le risque d'avoir des doublons dans la base.";
                     return redirect()->back()->with('nomenclatureError',$NotCorrect);
                 }
 
