@@ -246,7 +246,7 @@ class AggregatController extends Controller
 
         DB::delete('delete from aggregat_inputs');
         DB::delete('delete from aggregat_start');
-        
+        DB::delete('delete from aggregat_values');
         $indics  =  Indicators::whereIn('id', [225,226,251,252])->get(); 
         $ann = collect();
         $aggV = DB::table('mise_en_stages')->select('annee_stage')->distinct('annee_stage')->get();
@@ -261,9 +261,9 @@ class AggregatController extends Controller
         $ann = $this->ordonnerAnnee($ann);
         $isIndicAll = in_array('-1',$indicsChosen);
         $isAnneeAll = in_array('-1',$anneesChosen);
-        foreach ($ann as $an) {
-            DB::delete('delete from aggregat_values')->where('annee',$an);
-        }
+        /*foreach ($ann as $an) {
+            DB::delete('delete from aggregat_values where');
+        }*/
         
         if ($isIndicAll && $isAnneeAll) { 
             foreach ($indics as $indic) {
