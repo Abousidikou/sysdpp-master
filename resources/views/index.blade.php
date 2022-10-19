@@ -1,6 +1,30 @@
 @extends('layouts/master')
 
 
+@push('style')
+    <!-- <style type="text/css">
+            #flot-placeholder
+            {
+                width:350px;
+                height:300px;
+            }        
+    </style> -->
+<style>
+/*     #myProgress {
+    width: 100%;
+    background-color: #5834eb;
+    }
+
+    #myBar {
+    width: 10%;
+    height: 30px;
+    background-color: #04AA6D;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    } */
+</style>
+@endpush
 
 @section('content')
 
@@ -14,97 +38,97 @@
 
 <!-- Widgets -->
 
-<div class="row clearfix">
+    <div class="row clearfix">
 
-    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
 
-        <div class="info-box bg-pink hover-expand-effect">
+            <div class="info-box bg-pink hover-expand-effect">
 
-            <div class="icon">
+                <div class="icon">
 
-                <i class="material-icons">playlist_add_check</i>
+                    <i class="material-icons">playlist_add_check</i>
+
+                </div>
+
+                <div class="content">
+
+                    <div class="text">INDICATEURS</div>
+
+                    <div class="number count-to" data-from="0" data-to="{{$numberOfIndicators}}" data-speed="15" data-fresh-interval="20"></div>
+
+                </div>
 
             </div>
 
-            <div class="content">
+        </div>
 
-                <div class="text">INDICATEURS</div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
 
-                <div class="number count-to" data-from="0" data-to="{{$numberOfIndicators}}" data-speed="15" data-fresh-interval="20"></div>
+            <div class="info-box bg-cyan hover-expand-effect">
+
+                <div class="icon">
+
+                    <i class="material-icons">playlist_add_check</i>
+
+                </div>
+
+                <div class="content">
+
+                    <div class="text">NIVEAUX</div>
+
+                    <div class="number count-to" data-from="0" data-to="{{$numberOfLevels}}" data-speed="1000" data-fresh-interval="20"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+
+            <div class="info-box bg-light-green hover-expand-effect">
+
+                <div class="icon">
+
+                    <i class="material-icons">playlist_add_check</i>
+
+                </div>
+
+                <div class="content">
+
+                    <div class="text">TYPES</div>
+
+                    <div class="number count-to" data-from="0" data-to="{{$numberOfTypes}}" data-speed="1000" data-fresh-interval="20"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+
+            <div class="info-box bg-orange hover-expand-effect">
+
+                <div class="icon">
+
+                    <i class="material-icons">playlist_add_check</i>
+
+                </div>
+
+                <div class="content">
+
+                    <div class="text">DONNEES</div>
+
+                    <div class="number count-to" data-from="0" data-to="{{$numberOfData}}" data-speed="1000" data-fresh-interval="20"></div>
+
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-
-        <div class="info-box bg-cyan hover-expand-effect">
-
-            <div class="icon">
-
-                <i class="material-icons">playlist_add_check</i>
-
-            </div>
-
-            <div class="content">
-
-                <div class="text">NIVEAUX</div>
-
-                <div class="number count-to" data-from="0" data-to="{{$numberOfLevels}}" data-speed="1000" data-fresh-interval="20"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-
-        <div class="info-box bg-light-green hover-expand-effect">
-
-            <div class="icon">
-
-                <i class="material-icons">playlist_add_check</i>
-
-            </div>
-
-            <div class="content">
-
-                <div class="text">TYPES</div>
-
-                <div class="number count-to" data-from="0" data-to="{{$numberOfTypes}}" data-speed="1000" data-fresh-interval="20"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-
-        <div class="info-box bg-orange hover-expand-effect">
-
-            <div class="icon">
-
-                <i class="material-icons">playlist_add_check</i>
-
-            </div>
-
-            <div class="content">
-
-                <div class="text">DONNEES</div>
-
-                <div class="number count-to" data-from="0" data-to="{{$numberOfData}}" data-speed="1000" data-fresh-interval="20"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
 <!-- #END# Widgets -->
 
@@ -378,10 +402,26 @@
 
 <div class="row clearfix">
 
-    <!-- Task Info -->
-
+    <!-- Tableau-graphique et derniere ligne ajoutées de board Info -->
+    
+    
     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+        <div class="card">
 
+            <div class="header">
+
+                <h2 id="label">GRAPHIQUE </h2> 
+
+            </div>
+
+            <div class="body">
+
+                <div id=""><canvas id="flot-placeholder" width="500" height="300"></canvas></div>
+
+            </div>
+
+        </div>
+        <!-- Tableau de board Info -->
         <div class="card">
 
             <div class="header">
@@ -467,12 +507,37 @@
             </div>
 
         </div>
+        <!-- #END#  Info -->
+    </div>
+
+    <!-- #END#  Info -->
+
+
+
+    <!-- List subdomain 2/4 -->
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+
+        <div class="card">
+
+            <div class="header">
+
+                <h2>INDICATEURS RENSEIGNÉES</h2>
+
+            </div>
+
+            <div class="body">
+
+                <div id="myBar" class="dashboard-donut-chart"></div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <!-- #END# Task Info -->
-
-    <!-- Browser Usage -->
+    <!-- #END# List subdomain -->
+ 
+    <!-- Donuts Usage -->
 
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 
@@ -494,7 +559,7 @@
 
     </div>
 
-    <!-- #END# Browser Usage -->
+    <!-- #END# Donuts Usage -->
 
 </div>
 
@@ -504,12 +569,13 @@
 
     <script>
 
+        var domains = [];
+        var datas_audit = [];
+        var datas_func = [];
+
+
         window.onload = function(){
-
             var server_url = '{{url("/dash/stat")}}';
-
-            
-
             $.ajax({
 
                 url: server_url,
@@ -562,12 +628,608 @@
 
             })
 
+            var list_url = "{{ url('/listSousdomain') }}"
+            $.ajax({
+
+                url: list_url,
+
+                    method: "GET",
+
+                    dataType: 'text', 
+
+                    contentType:false,
+
+                    processData: false,
+
+
+
+                    success: function(response)
+
+                    {
+                       
+                        domains = JSON.parse(response);
+                        //console.log(domains);
+
+                        var cont = document.getElementById('myBar');
+                        document.getElementById('myBar').style.height = "250px";
+                        var ul = document.createElement('ul');
+                        ul.setAttribute('style', 'padding: 0; margin: 0;');
+                        ul.setAttribute('id', 'theList');
+                        for (const [key, obj1] of Object.entries(domains[3])) {
+                            var li = document.createElement('li');     // create li element.
+                            li.innerHTML = "<strong style='font-weight:bold;'>"+key+"</strong>"+" : "+obj1[0]+"/"+obj1[1];      // assigning text to li using array value.
+                            li.setAttribute('style', 'display: block;');   // remove the bullets.
+                            ul.appendChild(li);     // append li to ul.
+                        }
+
+                        cont.appendChild(ul);       // add list to the container. */
+
+                    },
+
+
+                error: function(error)
+
+                {
+
+                    console.log(error);
+
+                }
+
+            });
+
+           var audit_trav_url = "{{ url('/auditANDtravail') }}"
+            $.ajax({
+
+                url: audit_trav_url,
+
+                method: "GET",
+
+                dataType: 'text', 
+
+                contentType:false,
+
+                processData: false,
+
+
+
+                success: function(response)
+
+                {
+                    datas_audit = JSON.parse(response);
+                    document.getElementById('flot-placeholder').replaceChildren();
+                    document.getElementById('label').innerHTML = "Nombre d'usagers/clients ayant adressé une requête ou plainte au MTFP";
+                    //console.log('audit and travail : ',datas_audit);
+                    
+                    if(document.getElementById("flot-placeholder"))
+
+                    {
+
+                        const ctx = document.getElementById('flot-placeholder').getContext('2d');
+                        const dataer = {
+                            labels: datas_audit[0][0],
+                            datasets: [
+                                {
+                                label: 'Plaintes en cours',
+                                data: datas_audit[0][1],
+                                borderColor: "#cf0610",
+                                fill: false,
+                                cubicInterpolationMode: 'monotone',
+                                tension: 0.4
+                                }, {
+                                label: 'Plaintes traitées',
+                                data: datas_audit[0][2],
+                                borderColor: "#1b08c9",
+                                fill: false,
+                                tension: 0.4
+                                }, {
+                                label: 'Plaintes traitées',
+                                data: datas_audit[0][2],
+                                borderColor: "#08c945",
+                                fill: false
+                                }
+                            ]
+                        };
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: dataer,
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre d\'usagers/clients ayant adressé une requête ou plainte au MTFP'
+                                    },
+                                },
+                                interaction: {
+                                    intersect: false,
+                                },
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: {
+                                        display: true
+                                        }
+                                    },
+                                    y: {
+                                        display: true,
+                                        title: {
+                                        display: true,
+                                        text: 'Value'
+                                        },
+                                        suggestedMin: -10,
+                                        suggestedMax: 200
+                                    }
+                                }
+                            },
+                        });
+                            
+
+                    }
+                },
+
+                error: function(error)
+
+                {
+
+                    console.log(error);
+
+                }
+
+            });
+            
+
+            var func_reform_url = "{{ url('/funcANDreform') }}"
+            $.ajax({
+
+                url: func_reform_url,
+
+                method: "GET",
+
+                dataType: 'text', 
+
+                contentType:false,
+
+                processData: false,
+
+
+
+                success: function(response)
+
+                {
+                    datas_func = JSON.parse(response);
+                    document.getElementById('flot-placeholder').replaceChildren();
+                    document.getElementById('flot-placeholder').style.width = "500px";
+                    document.getElementById('flot-placeholder').style.height = "300px";
+                    //console.log('func and reform : ',datas_func);
+                    
+
+                },
+
+                error: function(error)
+
+                {
+
+                    console.log(error);
+
+                }
+
+            });
+
         }
 
 
 
-        function showMoreDetails(infoId)
 
+        /*************************           Fonction d'affichage             ******************************/
+        // ✅ Get first element with data-id = `box1²
+
+
+        
+        const travailSocial = document.querySelector('[data-id="10"]');
+        travailSocial.addEventListener("click", graphicTravailSocial);
+        const fonctionPublic = document.querySelector('[data-id="11"]');
+        fonctionPublic.addEventListener("click", graphicFonctionPublique);
+        const reforme = document.querySelector('[data-id="12"]');
+        reforme.addEventListener("click", graphicReforme);
+        const audit = document.querySelector('[data-id="13"]');
+        audit.addEventListener("click", graphicAudit);
+
+        
+       /*************************           END   Fonction d'affichage             ******************************/
+        
+        
+        
+
+        /************************       Fonctions            *********************/
+        function graphicAudit()
+        {
+            document.getElementById('flot-placeholder').replaceChildren();
+            document.getElementById('myBar').replaceChildren();
+            document.getElementById('flot-placeholder').style.width = "500px";
+            document.getElementById('flot-placeholder').style.height = "300px";
+            document.getElementById('myBar').style.height = "250px";
+
+            document.getElementById('label').innerHTML = "Evolution du nombre de plaintes";
+            
+            var cont = document.getElementById('myBar');
+            var ul = document.createElement('ul');
+            ul.setAttribute('style', 'padding: 0; margin: 0;');
+            ul.setAttribute('id', 'theList');
+            for (const [key, obj1] of Object.entries(domains[3])) {
+                var li = document.createElement('li');     // create li element.
+                li.innerHTML = "<strong style='font-weight:bold;'>"+key+"</strong>"+" : "+obj1[0]+"/"+obj1[1];      // assigning text to li using array value.
+                li.setAttribute('style', 'display: block;');   // remove the bullets.
+                ul.appendChild(li);     // append li to ul.
+            }
+
+            cont.appendChild(ul);       // add list to the container. */
+
+
+            if(document.getElementById("flot-placeholder"))
+
+            {
+
+                const ctx = document.getElementById('flot-placeholder').getContext('2d');
+                const dataer = {
+                    labels: datas_audit[0][0],
+                    datasets: [
+                            {
+                            label: 'Plaintes en cours',
+                            data: datas_audit[0][1],
+                            borderColor: "#cf0610",
+                            fill: false,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
+                            }, {
+                            label: 'Plaintes traitées',
+                            data: datas_audit[0][2],
+                            borderColor: "#1b08c9",
+                            fill: false,
+                            tension: 0.4
+                            }, {
+                            label: 'Plaintes traitées',
+                            data: datas_audit[0][2],
+                            borderColor: "#08c945",
+                            fill: false
+                            }
+                        ]
+                    };
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: dataer,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Nombre d\'usagers/clients ayant adressé une requête ou plainte au MTFP'
+                                },
+                            },
+                            interaction: {
+                                intersect: false,
+                            },
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: {
+                                    display: true
+                                    }
+                                },
+                                y: {
+                                    display: true,
+                                    title: {
+                                    display: true,
+                                    text: 'Value'
+                                    },
+                                    suggestedMin: -10,
+                                    suggestedMax: 200
+                                }
+                            }
+                    },
+                });
+                    
+
+            }
+            
+        } 
+
+
+
+
+        function graphicTravailSocial()
+        {
+            document.getElementById('flot-placeholder').replaceChildren();
+            document.getElementById('myBar').replaceChildren();
+            document.getElementById('flot-placeholder').style.width = "500px";
+            document.getElementById('flot-placeholder').style.height = "300px";
+            document.getElementById('myBar').style.height = "250px";
+
+            document.getElementById('label').innerHTML = "Evolution du nombre de contrat de travail visé ";
+            var cont = document.getElementById('myBar');
+
+            var ul = document.createElement('ul');
+            ul.setAttribute('style', 'padding: 0; margin: 0;');
+            ul.setAttribute('id', 'theList');
+            for (const [key, obj1] of Object.entries(domains[0])) {
+                var li = document.createElement('li');     // create li element.
+                li.innerHTML = "<strong style='font-weight:bold;'>"+key+"</strong>"+" : "+obj1[0]+"/"+obj1[1];      // assigning text to li using array value.
+                li.setAttribute('style', 'display: block;');   // remove the bullets.
+                ul.appendChild(li);     // append li to ul.
+            }
+
+            cont.appendChild(ul);       // add list to the container. */
+
+
+
+
+
+            if(document.getElementById("flot-placeholder"))
+
+            {
+
+                const ctx = document.getElementById('flot-placeholder').getContext('2d');
+                const dataer = {
+                    labels: datas_audit[1][0],
+                    datasets: [
+                        {
+                        label: 'Expatriés',
+                        data: datas_audit[1][1],
+                        borderColor: "#cf0610",
+                        fill: false,
+                        cubicInterpolationMode: 'monotone',
+                        tension: 0.4
+                        }, {
+                        label: 'Nationaux',
+                        data: datas_audit[1][2],
+                        borderColor: "#1b08c9",
+                        fill: false,
+                        tension: 0.4
+                        }, {
+                        label: 'Total',
+                        data: datas_audit[1][2],
+                        borderColor: "#08c945",
+                        fill: false
+                        }
+                    ]
+                };
+                new Chart(ctx, {
+                    type: 'line',
+                    data: dataer,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolution du nombre de contrat de travail visé'
+                        },
+                        },
+                        interaction: {
+                        intersect: false,
+                        },
+                        scales: {
+                        x: {
+                            display: true,
+                            title: {
+                            display: true
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                            display: true,
+                            text: 'Value'
+                            },
+                            suggestedMin: -10,
+                            suggestedMax: 200
+                        }
+                        }
+                    },
+                });
+                    
+
+            }
+            
+        }
+
+        function graphicFonctionPublique()
+        {
+
+            document.getElementById('flot-placeholder').replaceChildren();
+            document.getElementById('myBar').replaceChildren();
+            document.getElementById('flot-placeholder').style.width = "500px";
+            document.getElementById('flot-placeholder').style.height = "300px";
+            document.getElementById('myBar').style.height = "250px";
+
+            document.getElementById('label').innerHTML = "Evolution des effectifs des agents civils de l’état par statut";
+            var cont = document.getElementById('myBar');
+
+            var ul = document.createElement('ul');
+            ul.setAttribute('style', 'padding: 0; margin: 0;');
+            ul.setAttribute('id', 'theList');
+            for (const [key, obj1] of Object.entries(domains[1])) {
+                var li = document.createElement('li');     // create li element.
+                li.innerHTML = "<strong style='font-weight:bold;'>"+key+"</strong>"+" : "+obj1[0]+"/"+obj1[1];      // assigning text to li using array value.
+                li.setAttribute('style', 'display: block;');   // remove the bullets.
+                ul.appendChild(li);     // append li to ul.
+            }
+
+            cont.appendChild(ul);       // add list to the container. */
+
+
+
+            
+            if(document.getElementById("flot-placeholder"))
+
+            {
+
+                const ctx = document.getElementById('flot-placeholder').getContext('2d');
+                const dataer = {
+                    labels: datas_func[0][0],
+                    datasets: [
+                        {
+                        label: 'ACE',
+                        data: datas_func[0][1],
+                        borderColor: "#cf0610",
+                        fill: false,
+                        cubicInterpolationMode: 'monotone',
+                        tension: 0.4
+                        }, {
+                        label: 'APE',
+                        data: datas_func[0][2],
+                        borderColor: "#1b08c9",
+                        fill: false,
+                        tension: 0.4
+                        }, {
+                        label: 'Total',
+                        data: datas_func[0][2],
+                        borderColor: "#08c945",
+                        fill: false
+                        }
+                    ]
+                };
+                new Chart(ctx, {
+                    type: 'line',
+                    data: dataer,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolution des effectifs des agents civils de l’état par statut'
+                        },
+                        },
+                        interaction: {
+                        intersect: false,
+                        },
+                        scales: {
+                        x: {
+                            display: true,
+                            title: {
+                            display: true
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                            display: true,
+                            text: 'Value'
+                            },
+                            suggestedMin: -10,
+                            suggestedMax: 200
+                        }
+                        }
+                    },
+                });
+                    
+
+            }
+
+        }
+
+
+
+
+        function graphicReforme()
+        {
+            document.getElementById('flot-placeholder').replaceChildren();
+            document.getElementById('myBar').replaceChildren();
+            document.getElementById('flot-placeholder').style.width = "500px";
+            document.getElementById('flot-placeholder').style.height = "300px";
+            document.getElementById('myBar').style.height = "250px";
+            
+
+            document.getElementById('label').innerHTML = "Nombre de séminaire et formation ";
+            var cont = document.getElementById('myBar');
+
+            var ul = document.createElement('ul');
+            ul.setAttribute('style', 'padding: 0; margin: 0;');
+            ul.setAttribute('id', 'theList');
+            for (const [key, obj1] of Object.entries(domains[2])) {
+                var li = document.createElement('li');     // create li element.
+                li.innerHTML = "<strong style='font-weight:bold;'>"+key+"</strong>"+" : "+obj1[0]+"/"+obj1[1];      // assigning text to li using array value.
+                li.setAttribute('style', 'display: block;');   // remove the bullets.
+                ul.appendChild(li);     // append li to ul.
+            }
+
+            cont.appendChild(ul);       // add list to the container. */
+
+
+            if(document.getElementById("flot-placeholder"))
+
+            {
+
+                const ctx = document.getElementById('flot-placeholder').getContext('2d');
+                const dataer = {
+                    labels: datas_func[1][0],
+                    datasets: [
+                        {
+                        label: 'INFOSEC',
+                        data: datas_func[1][1],
+                        borderColor: "#cf0610",
+                        fill: false,
+                        cubicInterpolationMode: 'monotone',
+                        tension: 0.4
+                        }, {
+                        label: 'Séminaires',
+                        data: datas_func[1][2],
+                        borderColor: "#1b08c9",
+                        fill: false,
+                        tension: 0.4
+                        }, {
+                        label: 'Formations',
+                        data: datas_func[1][2],
+                        borderColor: "#08c945",
+                        fill: false
+                        }
+                    ]
+                };
+                new Chart(ctx, {
+                    type: 'line',
+                    data: dataer,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                        title: {
+                            display: true,
+                            text: 'Nombre de séminaire et formation'
+                        },
+                        },
+                        interaction: {
+                        intersect: false,
+                        },
+                        scales: {
+                        x: {
+                            display: true,
+                            title: {
+                            display: true
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                            display: true,
+                            text: 'Value'
+                            },
+                            suggestedMin: -10,
+                            suggestedMax: 200
+                        }
+                        }
+                    },
+                });
+                    
+
+            }
+            
+        }
+    
+
+        
+        
+        /************************       END    Fonction publique             *********************/
+        
+
+
+        function showMoreDetails(infoId)
         {
 
             var formData = new FormData();
@@ -626,10 +1288,7 @@
 
         }
 
-
-
         function showMoreLevel(infoId)
-
         {
 
             var formData = new FormData();

@@ -32,6 +32,13 @@ Auth::routes([
 
 Route::get('/dashboard', 'HomeController@index')->name('home');
 Route::get('/dash/stat','HomeController@stat');
+
+
+Route::get('listSousdomain','HomeController@listSousdomain');
+Route::get('auditANDtravail','HomeController@auditANDtravail');
+Route::get('funcANDreform','HomeController@funcANDreform');
+
+
 Route::prefix('create')->group(function(){
     Route::get('structure','Structure\StructureController@form')->name('form.structure');
     Route::get('level','Level\LevelController@form')->name('form.level');
@@ -164,6 +171,7 @@ Route::prefix('agentFormation')->group(function(){
 
     Route::get('genererExp','AgentFormation\AgentFormationController@genererExp')->name('agentFormation.genererExp');
 
+    Route::get('oneLine','AgentFormation\AgentFormationController@oneLine')->name('agentFormation.oneLine');
  });
 
 Route::prefix('miseEnStage')->group(function(){
@@ -186,6 +194,8 @@ Route::prefix('miseEnStage')->group(function(){
     Route::post('import','MiseEnStage\MiseEnStageController@import')->name('miseEnStage.import');
 
     Route::get('genererExp','MiseEnStage\MiseEnStageController@genererExp')->name('miseEnStage.genererExp');
+
+    Route::get('getPlanByAgentID/{id}','MiseEnStage\MiseEnStageController@getPlanByAgentID')->name('getPlanByAgentID');
  });
 
 Route::prefix('retourDeStage')->group(function(){

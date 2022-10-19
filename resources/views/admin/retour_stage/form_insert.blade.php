@@ -75,7 +75,7 @@
                             <div class="form-group form-float">
                                 <div class="form-line">
                                     <input type="text" class="form-control" name="numero_decision_rs" required>
-                                    <label class="form-label">Numéro de decision de retour en stage</label>
+                                    <label class="form-label">Numéro de référence</label>
                                 </div>
                                 <div class="help-info"></div>
                             </div>
@@ -228,7 +228,7 @@
     $( function() {
         $( "#date_signature" ).datepicker({
             dateFormat: "mm/dd/yy",
-            minDate: 0, 
+            //minDate: 0, 
             //maxDate: "+12M +10D"
         });
 
@@ -237,7 +237,7 @@
     $( function() {
         $( "#date_fin_formation" ).datepicker({
             dateFormat: "mm/dd/yy",
-            minDate: 0, 
+            //minDate: 0, 
             //maxDate: "+12M +10D"
         });
       } );
@@ -245,7 +245,7 @@
     $( function() {
         $( "#date_reprise_service" ).datepicker({
             dateFormat: "mm/dd/yy",
-            minDate: 0, 
+            //minDate: 0, 
             //maxDate: "+12M +10D"
         });
       } );

@@ -57,6 +57,17 @@
                         Une erreur s'est produite au cours de la modification... Veuillez rééssayer.
 
                     </div>
+                @elseif(session('validation'))
+
+                        <div class="alert bg-danger alert-dismissible" role="alert">
+
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                            Erreur de validation... Il se peut que l'agent existe déjà. <br>
+
+                            Veuillez rééssayer.
+
+                        </div>
 
                 @endif 
 
@@ -104,21 +115,30 @@
 
                             <select name="role" id="role" class="form-control show-tick">
                                 @if($agent->role == "admin")
-                                    <option value="admin" selected>Administrateurs</option>
-                                    <option value="see_stats">Voir les stats</option>
-                                    <option value="agents_m">Agents Manage</option>
+                                    <option value="admin" selected>Administrateur</option>
+                                    <option value="see_stats">Utilisateur simple</option>
+                                    <option value="agents_m">Gérant des Agents</option>
+                                    <option value="agents_gen">Gérant des Agents | Agrégats</option>
                                 @elseif($agent->role == "see_stats")
-                                    <option value="admin" >Administrateurs</option>
-                                    <option value="see_stats" selected>Voir les stats</option>
-                                    <option value="agents_m">Agents Manage</option>
+                                    <option value="admin" >Administrateur</option>
+                                    <option value="see_stats" selected>Utilisateur simple</option>
+                                    <option value="agents_m">Gérant des Agents</option>
+                                    <option value="agents_gen">Gérant des Agents | Agrégats</option>
                                 @elseif($agent->role == "agents_m")
-                                    <option value="admin" >Administrateurs</option>
-                                    <option value="see_stats" >Voir les stats</option>
-                                    <option value="agents_m" selected>Agents Manage</option>
+                                    <option value="admin" >Administrateur</option>
+                                    <option value="see_stats" >Utilisateur simple</option>
+                                    <option value="agents_m" selected>Gérant des Agents</option>
+                                    <option value="agents_gen">Gérant des Agents | Agrégats</option>
+                                @elseif($agent->role == "agents_gen")
+                                    <option value="admin" >Administrateur</option>
+                                    <option value="see_stats" >Utilisateur simple</option>
+                                    <option value="agents_m" >Gérant des Agents</option>
+                                    <option value="agents_gen" selected>Gérant des Agents | Agrégats</option>
                                 @else
-                                    <option value="admin" >Administrateurs</option>
-                                    <option value="see_stats" selected>Voir les stats</option>
-                                    <option value="agents_m">Agents Manage</option>
+                                    <option value="admin" >Administrateur</option>
+                                    <option value="see_stats" selected>Utilisateur simple</option>
+                                    <option value="agents_m">Gérant des Agents</option>
+                                    <option value="agents_gen">Gérant des Agents | Agrégats</option>
                                 @endif
                             </select>
 

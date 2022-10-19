@@ -81,11 +81,6 @@
 
                             Toutes les donnees n'ont pu etre sauvegarde<br>
 
-                            Veuillez voir ci-joint le fichier contenant les lignes non enregistrees<br>
-                            Veillez vérifier que l'agent existe déjà
-                            <br>
-                            L'agent est peut être déjà en stage
-
                         </div>
 
                     @elseif(session('nomenclatureError'))
@@ -130,7 +125,7 @@
 
                         <button class="btn btn-primary waves-effect" type="submit">IMPORTER</button>
 
-                        <a href="{{ route('retourDeStage.data') }}" class="btn btn-warning waves-effect">Liste des mise en stages</a>
+                        <a href="{{ route('retourDeStage.data') }}" class="btn btn-warning waves-effect">Liste des retours de stages</a>
 
                         @if(session('examplaire'))
                             @php

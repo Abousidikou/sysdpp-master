@@ -35,8 +35,8 @@
                         <tr>
                             <th>Matricule</th>
                             <th>Nom & prenoms</th>
-                            <th>Date de fin de formation</th>
-                            <th>Date de signature de retour</th>
+                            <th>Catégorie RS</th>
+                            <th>Année RS</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -45,8 +45,8 @@
                         <tr>
                             <td>{{$r_s->agent->matricule ?? ''}}</td>
                             <td>{{$r_s->agent->nom_prenoms ?? ''}}</td>
-                            <td>{{$r_s->date_fin_formation ?? ''}}</td>
-                            <td>{{$r_s->date_signature ?? ''}}</td>
+                            <td>{{$r_s->categorie_rs ?? ''}}</td>
+                            <td>{{$r_s->annee_rs ?? ''}}</td>
                             @if(Auth::user()->role == "admin" || Auth::user()->role == "agents_m")
                                 <td>
                                     <div style="display: flex">
@@ -62,7 +62,7 @@
                                         </a>
                                         <!-- Button trigger modal -->
                                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal{{ $r_s->id }}">
-                                          Détail
+                                        <i class="material-icons">info</i>
                                         </button>
                                     </div>
                                 </td>
@@ -86,7 +86,7 @@
                             <hr>
                             <strong>Nom & prenoms : </strong>    <small>{{$r_s->agent->nom_prenoms ?? ''}}</small></strong>
                             <hr>
-                            <strong>Numéro de decision de retour de stage : </strong>    <small>{{$r_s->numero_decision_rs ?? ''}}</small>
+                            <strong>Numéro de référence : </strong>    <small>{{$r_s->numero_decision_rs ?? ''}}</small>
                             <hr>
                             <strong>Date de signature de retour de stage : </strong>    <small>{{$r_s->date_signature ?? ''}}</small>
                             <hr>
@@ -117,7 +117,7 @@
                     
 
 
-                    @if(Auth::user()->role == "admin" || Auth::user()->role == "agents_m" )
+                    @if(Auth::user()->role == "admin" || Auth::user()->role == "agents_m" || Auth::user()->role == "agents_gen" )
                         <caption style="caption-side: top; text-align:center" title="Cliquer pour ajouter un nouvel agent">
                             <a href="{{route('retourDeStage.form_insert')}}" class="btn bg-green waves-effect">Ajouter une entrée</a>
                             <a href="{{ route('retourDeStage.export') }}" class="btn bg-green waves-effect">Exporter</a>

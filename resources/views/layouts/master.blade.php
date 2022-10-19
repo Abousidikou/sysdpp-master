@@ -52,6 +52,7 @@
     <!-- JQuery DataTable Css -->
     <link href="{{asset('template/adminBSB/plugins/dataTables.bootstrap.css')}}" rel="stylesheet">
 
+   
     
 
 
@@ -215,80 +216,116 @@
                 @else
 
                     @if(Auth::user()->role=="admin")
-
-                        <a href="{{route('domains')}}" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES DOMAINES
-                            </p>
+                    <div class="dropdown">
+                        <a href="#" class="list-group-item btn btn-secondary dropdown-toggle"  role="button" id="dropdownMenuLinkAdmin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <p class="list-group-item-text" style="font-size: larger;">
+                                  Admin<i class="material-icons">arrow_drop_down</i>
+                                </p>
                         </a>
 
-                        <a href="{{route('subdomains')}}" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES SOUS-DOMAINES
-                            </p>
-                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a href="{{route('domains')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES DOMAINES
+                                </p>
+                            </a>
 
-                        <a href="{{route('structures')}}" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES STRUCTURES
-                            </p>
-                        </a>
+                            <a href="{{route('subdomains')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES SOUS-DOMAINES
+                                </p>
+                            </a>
 
-                        @if(Auth::user()->role == "admin")
+                            <a href="{{route('structures')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES STRUCTURES
+                                </p>
+                            </a>
+
                             <a href="{{route('agents')}}" class="list-group-item">
                                 <p class="list-group-item-text">
                                     GESTION DES UTILISATEURS
                                 </p>
                             </a>
-                        @endif
-                        
-                        <a href="{{route('indicators')}}" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES INDICATEURS
-                            </p>
-                        </a>
-
-
-                        <a href="{{route('levels')}}" class="list-group-item">
-                            <p class="list-group-item-text">
-                                GESTION DES NIVEAUX DE DESAGREGATION
-                            </p>
-                        </a>
-
-                        <a href="{{route('infos')}}" class="list-group-item">
+                            
+                            <a href="{{route('indicators')}}" class="list-group-item">
                                 <p class="list-group-item-text">
-                                    GESTION DES INFORMATIONS STATISTIQUES
+                                    GESTION DES INDICATEURS
+                                </p>
+                            </a>
+
+
+                            <a href="{{route('levels')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES NIVEAUX DE DESAGREGATION
+                                </p>
+                            </a>
+
+                            <a href="{{route('infos')}}" class="list-group-item">
+                                    <p class="list-group-item-text">
+                                        GESTION DES INFORMATIONS STATISTIQUES
+                                    </p>
+                            </a>
+                        </div>
+                    </div>
+                    <br><br><br>
+                    <div class="dropdown">
+                        <a href="#" class="list-group-item btn btn-secondary dropdown-toggle"  role="button" id="dropdownMenuLinkFormation" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <p class="list-group-item-text" style="font-size: larger;">
+                                  Formation<i class="material-icons">arrow_drop_down</i>
                                 </p>
                         </a>
 
-                    @elseif(Auth::user()->role=="agents_m")
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a href="{{route('agentFormation.data')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES PLANS DE FORMATION
+                                </p>
+                            </a>
+                            <a href="{{route('miseEnStage.data')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES MISES EN STAGE
+                                </p>
+                            </a>
+
+                            <a href="{{route('retourDeStage.data')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    GESTION DES RETOURS DE STAGE
+                                </p>
+                            </a>
+
+                            <a href="{{route('aggregat.index')}}" class="list-group-item">
+                                <p class="list-group-item-text">
+                                    EXPORTER LES AGREGATS
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                    @elseif(Auth::user()->role=="agents_m" || Auth::user()->role == "agents_gen")
                         <a href="{{route('agentFormation.data')}}" class="list-group-item">
                             <p class="list-group-item-text">
-                                GESTION DES AGENTS EN FORMATION
+                                GESTION DES PLANS DE FORMATION
                             </p>
                         </a>
                         <a href="{{route('miseEnStage.data')}}" class="list-group-item">
                             <p class="list-group-item-text">
-                                GESTION DES MISES EN FORMATION
+                                GESTION DES MISES EN STAGE
                             </p>
                         </a>
 
                         <a href="{{route('retourDeStage.data')}}" class="list-group-item">
                             <p class="list-group-item-text">
-                                GESTION DES RETOURS DE FORMATION
+                                GESTION DES RETOURS DE STAGE
                             </p>
                         </a>
 
                         <a href="{{route('aggregat.index')}}" class="list-group-item">
                             <p class="list-group-item-text">
-                                EXPORTER LES AGGREGATS
+                                EXPORTER LES AGREGATS
                             </p>
                         </a>
 
-                    @endif                     
-                        @if(Auth::user()->role != 'agents_m')
-                            
-                        @endif
+                    @endif         
                         <br><br><br>
                         <a href="{{ route('logout') }}"
                                 class="list-group-item text-center btn-danger"
@@ -371,7 +408,7 @@
     <script src="{{asset('template/adminBSB/plugins/morrisjs/morris.js')}}"></script>
 
     <!-- ChartJs -->
-    <script src="{{asset('template/adminBSB/plugins/chartjs/Chart.bundle.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
     <!-- Flot Charts Plugin Js -->
     <script src="{{asset('template/adminBSB/plugins/flot-charts/jquery.flot.js')}}"></script>
@@ -410,6 +447,8 @@
 
     <!-- Custom local Dev Js -->
     <script>
+
+  
         jQuery(document).ready(function($) {
                 $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : $('meta[name="_token"]').attr('content') }
